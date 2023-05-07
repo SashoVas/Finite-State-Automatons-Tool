@@ -24,16 +24,20 @@ public:
 	T& operator[](size_t index);
 	const T& operator[](size_t index) const;
 
+	int getSize()const;
+	int find(const T& other)const;
+
 	void add(const T& element);
 	void remove();
+	void empty();
 };
 
 template <class T>
 void CustomCollection<T>::copyFrom(const CustomCollection& other) {
 	T* newData = new T[other.capacity];
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < other.size; i++)
 	{
-		newData[i] = elements[i];
+		newData[i] = other.elements[i];
 	}
 	size = other.size;
 	capacity = other.capacity;
@@ -80,7 +84,7 @@ CustomCollection<T>::~CustomCollection() {
 
 template <class T>
 CustomCollection<T>& CustomCollection<T>::operator=(const CustomCollection& other) {
-	if (this!=*other)
+	if (this!= &other)
 	{
 		free();
 		copyFrom(other);
@@ -90,7 +94,7 @@ CustomCollection<T>& CustomCollection<T>::operator=(const CustomCollection& othe
 
 template <class T>
 CustomCollection<T>::CustomCollection(CustomCollection&& other) {
-	moveFrom();
+	moveFrom(std::move(other));
 }
 
 template <class T>
@@ -98,7 +102,7 @@ CustomCollection<T>& CustomCollection<T>::operator=(CustomCollection&& other){
 	if (this != *other)
 	{
 		free();
-		moveFrom(other);
+		moveFrom(std::move(other));
 	}
 	return *this;
 }
@@ -142,4 +146,25 @@ void CustomCollection<T>::remove() {
 	{
 		resize(capacity/2);
 	}
+}
+
+template <class T>
+void CustomCollection<T>::empty() {
+	size = 0;
+	resize(8);
+}
+
+template <class T>
+int CustomCollection<T>::getSize()const {
+	return size;
+}
+
+template <class T>
+int CustomCollection<T>::find(const T& other)const {
+	for (int i = 0; i < size; i++)
+	{
+		if (elements[i] == other)
+			return i;
+	}
+	return -1;
 }

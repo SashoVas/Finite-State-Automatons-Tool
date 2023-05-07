@@ -14,10 +14,23 @@ private:
 	RegularExpression* right=nullptr;
 	char value='\0';
 	RegularExpression() = default;
+
+	void free();
+	void copyFrom(const RegularExpression& other);
+	void moveFrom(RegularExpression&& other);
+
 public:
+	RegularExpression(const RegularExpression& other);
+	RegularExpression(RegularExpression&& other);
+	~RegularExpression();
 	RegularExpression(const MyString& str);
+
+	RegularExpression& operator=(const RegularExpression& other);
+	RegularExpression& operator=(RegularExpression&& other);
+
 	Type getType()const;
 	MyString getRegEx()const;
+
 	void printRegEx()const;
 	const RegularExpression& getLeft()const;
 	const RegularExpression& getRight()const;
@@ -26,12 +39,71 @@ public:
 	static RegularExpression* buildRegex(const MyString& str, int& currentPosition);
 };
 
+RegularExpression::RegularExpression(RegularExpression&& other) {
+	moveFrom(std::move(other));
+}
+
+RegularExpression::RegularExpression(const RegularExpression& other) {
+	copyFrom(other);
+}
+RegularExpression::~RegularExpression(){
+	free();
+}
+RegularExpression& RegularExpression::operator=(const RegularExpression& other) {
+	if (this != &other)
+	{
+		free();
+		copyFrom(other);
+	}
+	return *this;
+}
+RegularExpression& RegularExpression::operator=(RegularExpression&& other) {
+	if (this != &other)
+	{
+		free();
+		moveFrom(std::move(other));
+	}
+	return *this;
+}
+
+void RegularExpression::free() {
+	delete left;
+	left = nullptr;
+	delete right;
+	right = nullptr;
+}
+void RegularExpression::copyFrom(const RegularExpression& other){
+	value = other.value;
+	type = other.type;
+	if (other.left != nullptr)
+	{
+		left = new RegularExpression();
+		left->copyFrom(*(other.left));
+	}
+	if (other.right != nullptr)
+	{
+		right = new RegularExpression();
+		right->copyFrom(*(other.right));
+	}
+}
+void RegularExpression::moveFrom(RegularExpression&& other) {
+	left = other.left;
+	right = other.right;
+	type = other.type;
+	value = other.value;
+	other.left = nullptr;
+	other.right = nullptr;
+}
+
 RegularExpression::RegularExpression(const MyString& str) {
 	int index=0;
 	RegularExpression* regEx = buildRegex(str, index);
 	left = regEx->left;
 	right = regEx->right;
 	type = regEx->type;
+	value = regEx->value;
+	regEx->left = nullptr;
+	regEx->right = nullptr;
 	delete regEx;
 }
 
@@ -103,12 +175,30 @@ RegularExpression* RegularExpression::buildRegex(const MyString& str, int& curre
 	{
 		currentPosition++;
 		result->left = buildRegex(str, currentPosition);
-		result->type = Type::KleeneStar;
+		if (str[currentPosition + 1] == '*')
+		{
+			result->type = Type::KleeneStar;
+			currentPosition += 2;
+			if (currentPosition==str.length())
+				return result;
+			result = extend(result, Type::Concatenation);
+		}
+		else {
+			result->type = Type::Concatenation;
+			currentPosition++;
+		}
 	}
 	else {
 		result->left = getSymbolRegEX(str[currentPosition]);;
 		result->type = Type::Concatenation;
 		currentPosition++;
+		if (currentPosition<str.length() && str[currentPosition] == ')')
+		{
+			RegularExpression* lhs = result->left;
+			result->left = nullptr;
+			delete result;
+			return lhs;
+		}
 	}
 
 	for (; currentPosition < str.length(); currentPosition++)
@@ -128,17 +218,18 @@ RegularExpression* RegularExpression::buildRegex(const MyString& str, int& curre
 		else if (str[currentPosition] == ')')
 		{
 			RegularExpression* lhs = result->left;
+			result->left = nullptr;
 			delete result;
 			return lhs;
 		}
 		else if (str[currentPosition] == '+') {
+
 			result->type = Type::Union;
 			currentPosition++;
-			if (str[currentPosition] == '(')
-				currentPosition++;
 			result->right = buildRegex(str, currentPosition);
 			if (str[currentPosition] == ')')
 				return result;
+				
 			result = extend(result, Type::Concatenation);
 		}
 		else {
@@ -147,7 +238,7 @@ RegularExpression* RegularExpression::buildRegex(const MyString& str, int& curre
 		}
 	}
 	RegularExpression* lhs = result->left;
+	result->left = nullptr;
 	delete result;
 	return lhs;
-	return result;
 }
