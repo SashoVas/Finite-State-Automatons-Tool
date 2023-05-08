@@ -2,13 +2,14 @@
 #include <iostream>
 #include "MyString.h"
 class RegularExpression {
-private:
+public:
 	enum class Type {
 		Concatenation,
 		Union,
 		KleeneStar,
 		Symbol
 	};
+private:
 	Type type;
 	RegularExpression* left=nullptr;
 	RegularExpression* right=nullptr;
@@ -20,6 +21,8 @@ private:
 	void moveFrom(RegularExpression&& other);
 
 public:
+
+
 	RegularExpression(const RegularExpression& other);
 	RegularExpression(RegularExpression&& other);
 	~RegularExpression();
@@ -30,6 +33,7 @@ public:
 
 	Type getType()const;
 	MyString getRegEx()const;
+	char getValue()const;
 
 	void printRegEx()const;
 	const RegularExpression& getLeft()const;
@@ -64,6 +68,9 @@ RegularExpression& RegularExpression::operator=(RegularExpression&& other) {
 		moveFrom(std::move(other));
 	}
 	return *this;
+}
+char RegularExpression::getValue()const {
+	return value;
 }
 
 void RegularExpression::free() {

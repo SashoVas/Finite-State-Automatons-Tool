@@ -99,7 +99,7 @@ CustomCollection<T>::CustomCollection(CustomCollection&& other) {
 
 template <class T>
 CustomCollection<T>& CustomCollection<T>::operator=(CustomCollection&& other){
-	if (this != *other)
+	if (this != &other)
 	{
 		free();
 		moveFrom(std::move(other));
