@@ -22,9 +22,16 @@ private:
 
 	void combine(const FiniteAutomata& other);
 	void addToAlphabet(char symbol);
+	//
+	bool haveTransitionWihtSymbol(int node,char symbol);
+	void addErrorState();
+	CustomCollection<int> getNodeStates(const CustomCollection<int>&nodes, char symbol)const;
+	bool haveFinal(const CustomCollection<int>& nodes)const;
+	//
 public:
 
 	FiniteAutomata(int size);
+	FiniteAutomata() = default;
 	FiniteAutomata(char symbol);
 	FiniteAutomata(const RegularExpression& regEx);
 
@@ -34,6 +41,7 @@ public:
 	void makeFinal(int index);
 
 	void makeDeterministic();
+	void makeTotal();
 
 	FiniteAutomata& UnionWith(const const FiniteAutomata& rhs);
 	FiniteAutomata& ConcatenationWith(const const FiniteAutomata& rhs);
@@ -251,5 +259,142 @@ FiniteAutomata FiniteAutomata::buildFromRegex(const RegularExpression& regEx) {
 	{
 		FiniteAutomata lhs = buildFromRegex(regEx.getLeft());
 		return lhs.KleeneStar();
+	}
+}
+CustomCollection<int> FiniteAutomata::getNodeStates(const CustomCollection<int>& nodes,char symbol)const {
+	CustomCollection<int>result;
+	for (int j = 0; j < nodes.getSize(); j++)
+	{
+		int node = nodes[j];
+	
+		for (int i = 0; i < automata[node].getSize(); i++)
+		{
+			if (automata[node][i].symbol==symbol)
+			{
+				result.add(automata[node][i].dest);
+			}
+		}
+	}
+	return result;
+}
+struct StateTuple {
+	CustomCollection<int> states;
+	int newStateIndex=-1;
+	StateTuple() = default;
+	StateTuple(CustomCollection<int>&&states, int newStateIndex) {
+		this->newStateIndex = newStateIndex;
+		this->states = std::move(states);
+	}
+};
+int findInTableByNode(int node,const CustomCollection<StateTuple>&stateTable) {
+	for (int i = 0; i < stateTable.getSize(); i++)
+	{
+		if (stateTable[i].newStateIndex==node)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+int findInTableByNodeByStates(const CustomCollection<int>& currentStates,const CustomCollection<StateTuple>& stateTable) {
+	for (int i = 0; i < stateTable.getSize(); i++)
+	{
+		if (stateTable[i].states == currentStates)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+bool FiniteAutomata::haveFinal(const CustomCollection<int>& nodes)const {
+	for (int i = 0; i < nodes.getSize(); i++)
+	{
+		if (finalStates.find(nodes[i])!=-1)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void FiniteAutomata::makeDeterministic() {
+
+	FiniteAutomata newAutomaton;
+
+	CustomCollection<StateTuple>stateTable;
+	CustomCollection<int>queue;
+	CustomCollection<int>newStart;
+
+	newStart.add(startNode);
+	queue.add(0);
+	stateTable.add(StateTuple(std::move(newStart),0));
+	newAutomaton.addState();
+	int currentCount = 0;
+	while (queue.getSize()-currentCount>0)
+	{
+		int currentInNew = queue[currentCount];
+		CustomCollection<int>& currentStates = stateTable[findInTableByNode(currentInNew, stateTable)].states;
+		for (int i = 0; i < alphabet.getSize(); i++)
+		{
+			char currentChar = alphabet[i];
+			CustomCollection<int> nextStates = getNodeStates(currentStates,currentChar);
+			int nextStatesPositionInTable = findInTableByNodeByStates(nextStates,stateTable);
+			if (nextStatesPositionInTable==-1)
+			{
+				newAutomaton.addState();
+				queue.add(newAutomaton.nodes - 1);
+				if (haveFinal(nextStates))
+				{
+					newAutomaton.makeFinal(newAutomaton.nodes-1);
+				}
+				stateTable.add(StateTuple(std::move(nextStates), newAutomaton.nodes - 1));
+				newAutomaton.addTransition(currentInNew,Transition(newAutomaton.nodes-1,currentChar));
+			}
+			else
+			{
+				newAutomaton.addTransition(currentInNew, Transition(stateTable[nextStatesPositionInTable].newStateIndex, currentChar));
+			}
+
+		}
+		currentCount++;
+	}
+	newAutomaton.makeTotal();
+	*this =std::move( newAutomaton);
+}
+void FiniteAutomata::addErrorState() {
+	addState();
+	for (int i = 0; i < alphabet.getSize(); i++)
+	{
+		addTransition(nodes - 1,Transition(nodes-1, alphabet[i]));
+	}
+	
+}
+bool FiniteAutomata::haveTransitionWihtSymbol(int node, char symbol) {
+	for (int i = 0; i < automata[node].getSize(); i++)
+	{
+		if (automata[node][i].symbol==symbol)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void FiniteAutomata::makeTotal() {
+	bool haveError = false;
+	for (int i = 0; i < nodes; i++)
+	{
+		for (int j = 0; j < alphabet.getSize(); j++)
+		{
+			if (!haveTransitionWihtSymbol(i,alphabet[j]))
+			{
+				if (!haveError)
+				{
+					addErrorState();
+					haveError = true;
+				}
+				addTransition(i,Transition(nodes-1,alphabet[j]));
+			}
+		}
 	}
 }

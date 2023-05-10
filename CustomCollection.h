@@ -23,6 +23,7 @@ public:
 
 	T& operator[](size_t index);
 	const T& operator[](size_t index) const;
+	bool operator==(const CustomCollection& other)const;
 
 	int getSize()const;
 	int find(const T& other)const;
@@ -167,4 +168,27 @@ int CustomCollection<T>::find(const T& other)const {
 			return i;
 	}
 	return -1;
+}
+
+template <class T>
+bool CustomCollection<T>::operator==(const CustomCollection& other)const {
+	if (size!=other.getSize())
+	{
+		return false;
+	}
+	for (int i = 0; i < size; i++)
+	{
+		if (other.find(elements[i])==-1)
+		{
+			return false;
+		}
+	}
+	for (int i = 0; i < other.getSize(); i++)
+	{
+		if (find(other[i])==-1)
+		{
+			return false;
+		}
+	}
+	return true;
 }
