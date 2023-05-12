@@ -172,10 +172,10 @@ int CustomCollection<T>::find(const T& other)const {
 
 template <class T>
 bool CustomCollection<T>::operator==(const CustomCollection& other)const {
-	if (size!=other.getSize())
-	{
-		return false;
-	}
+	//if (size!=other.getSize())
+	//{
+	//	return false;
+	//}
 	for (int i = 0; i < size; i++)
 	{
 		if (other.find(elements[i])==-1)

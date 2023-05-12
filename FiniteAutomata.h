@@ -23,9 +23,10 @@ private:
 	void combine(const FiniteAutomata& other);
 	void addToAlphabet(char symbol);
 	//
-	bool haveTransitionWihtSymbol(int node,char symbol);
+	bool haveTransitionWihtSymbol(int node,char symbol,int to=-1)const;
 	void addErrorState();
 	CustomCollection<int> getNodeStates(const CustomCollection<int>&nodes, char symbol)const;
+	RegularExpression generateRegEx(int i,int j,int k, bool epsilon)const;
 	bool haveFinal(const CustomCollection<int>& nodes)const;
 	//
 public:
@@ -40,6 +41,8 @@ public:
 	void addTransition(int index, const Transition& transition);
 	void makeFinal(int index);
 
+	RegularExpression getRegEx()const;
+
 	void makeDeterministic();
 	void makeTotal();
 
@@ -47,15 +50,15 @@ public:
 	FiniteAutomata& ConcatenationWith(const const FiniteAutomata& rhs);
 	FiniteAutomata& KleeneStar();
 
-	friend FiniteAutomata Union(const FiniteAutomata& lhs,const FiniteAutomata& rhs);
-	friend FiniteAutomata Concatenation(const FiniteAutomata& lhs,const FiniteAutomata& rhs);
-	friend FiniteAutomata KleeneStar(const FiniteAutomata& lhs);
 
 	void print()const;
 
 	static FiniteAutomata buildFromRegex(const RegularExpression& regEx);
 };
 
+FiniteAutomata Union(const FiniteAutomata& lhs,const FiniteAutomata& rhs);
+FiniteAutomata Concatenation(const FiniteAutomata& lhs,const FiniteAutomata& rhs);
+FiniteAutomata KleeneStar(const FiniteAutomata& lhs);
 FiniteAutomata::FiniteAutomata(int size) {
 	startNode = 0;
 	for (int i = 0; i < size; i++)
@@ -321,7 +324,7 @@ void FiniteAutomata::makeDeterministic() {
 
 	FiniteAutomata newAutomaton;
 
-	CustomCollection<StateTuple>stateTable;
+	CustomCollection<StateTuple>stateTable(64);
 	CustomCollection<int>queue;
 	CustomCollection<int>newStart;
 
@@ -329,10 +332,15 @@ void FiniteAutomata::makeDeterministic() {
 	queue.add(0);
 	stateTable.add(StateTuple(std::move(newStart),0));
 	newAutomaton.addState();
+	if (finalStates.find(startNode)!=-1)
+	{
+		newAutomaton.makeFinal(0);
+	}
 	int currentCount = 0;
 	while (queue.getSize()-currentCount>0)
 	{
 		int currentInNew = queue[currentCount];
+
 		CustomCollection<int>& currentStates = stateTable[findInTableByNode(currentInNew, stateTable)].states;
 		for (int i = 0; i < alphabet.getSize(); i++)
 		{
@@ -369,12 +377,12 @@ void FiniteAutomata::addErrorState() {
 	}
 	
 }
-bool FiniteAutomata::haveTransitionWihtSymbol(int node, char symbol) {
+bool FiniteAutomata::haveTransitionWihtSymbol(int node, char symbol, int to) const{
 	for (int i = 0; i < automata[node].getSize(); i++)
 	{
 		if (automata[node][i].symbol==symbol)
 		{
-			return true;
+			return to == -1 ? true : automata[node][i].dest == to;
 		}
 	}
 	return false;
@@ -397,4 +405,69 @@ void FiniteAutomata::makeTotal() {
 			}
 		}
 	}
+}
+RegularExpression FiniteAutomata::getRegEx()const {
+	RegularExpression result('\0');
+	bool isSet = false;
+	for (int i = 0; i < finalStates.getSize(); i++)
+	{
+		if (!isSet)
+		{
+			result=generateRegEx(startNode, finalStates[i], nodes, true);
+			isSet = true;
+		}
+		else
+		{
+			result.UnionWith(generateRegEx(startNode, finalStates[i], nodes,true));
+		}
+	}
+	return result;
+}
+RegularExpression FiniteAutomata::generateRegEx(int i, int j, int k,bool epsilon)const {
+	if (k==0)
+	{
+		RegularExpression result('\0');
+		bool isSet = false;
+		for (int symbol = 0; symbol < alphabet.getSize(); symbol++)
+		{
+			if (haveTransitionWihtSymbol(i,alphabet[symbol],j))
+			{
+				if (!isSet)
+				{
+					result.setValue(alphabet[symbol]);
+					isSet = true;
+				}
+				else
+					result.UnionWith(alphabet[symbol]);
+			}
+		}
+		if (i==j && epsilon)
+		{
+			if (isSet)
+			{
+				result.UnionWith('$');
+			}
+			else
+				result.setValue('$');
+		}
+		return result;
+	}
+	RegularExpression lhs = generateRegEx(i,j,k-1,epsilon);
+	RegularExpression rhs = generateRegEx(i, k - 1, k - 1, epsilon);
+	RegularExpression middle = generateRegEx(k - 1, k - 1, k - 1,false);
+	RegularExpression end = generateRegEx(k - 1, j, k - 1, epsilon);
+	if (rhs.isEmpty()||end.isEmpty())
+	{
+		return lhs;
+	}
+	middle.KleeneStar();
+	rhs.ConcatenationWith(middle);
+	rhs.ConcatenationWith(end);
+
+	if (lhs.isEmpty())
+	{
+		return rhs;
+	}
+	lhs.UnionWith(rhs);
+	return lhs;
 }

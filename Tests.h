@@ -37,15 +37,16 @@ bool Tests::runRegularExpressionGetRegExTests() {
 	std::cout<< (RegularExpression("(((a)*(b)*)*)*+(((a)*(b)*)*)*c").getRegEx() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
 	std::cout<< (RegularExpression("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)").getRegEx() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
 	std::cout<< (RegularExpression("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)").getRegEx() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
+	std::cout<< (RegularExpression("ab(a+c)*").getRegEx() == "ab((a+c))*") << std::endl;
 
 	//MyString inputs[64] = { "a(a+b)*b+b(a+b)*a","a","ab","ab+ac","(ab+ac)*","(ab+ac)*+a","(ab+ac)*+a+b","(ab+ac)*+a+ba","((ab+ac)*+a+ba)c"
 	//,"((ab+ac)*+a+ba)c+d","((ab+ac)*+a+ba)c+d+b","((ab+ac)*+a+ba)c+d+(b)*","(a)*","(a)*+(b)*","((a)*+(b)*)*","((ab)*+(bb)*)*","abcd","(a)*(b)*"
-	//,"((a)*(b)*)*","(((a)*(b)*)*)*","(((a)*(b)*)*)*+(((a)*(b)*)*)*","((((a)*(b)*)*)*+(((a)*(b)*)*)*)c","(((a)*(b)*)*)*+(((a)*(b)*)*)*c","a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)" };
+	//,"((a)*(b)*)*","(((a)*(b)*)*)*","(((a)*(b)*)*)*+(((a)*(b)*)*)*","((((a)*(b)*)*)*+(((a)*(b)*)*)*)c","(((a)*(b)*)*)*+(((a)*(b)*)*)*c","a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)","ab(a+c)*" };
 
 	//MyString outputs[64] = { "(a((a+b))*b+b((a+b))*a)" ,"a","ab", "(ab+ac)","((ab+ac))*","(((ab+ac))*+a)","(((ab+ac))*+(a+b))"
 	//	,"(((ab+ac))*+(a+ba))","(((ab+ac))*+(a+ba))c","((((ab+ac))*+(a+ba))c+d)","((((ab+ac))*+(a+ba))c+(d+b))","((((ab+ac))*+(a+ba))c+(d+(b)*))"
 	//,"(a)*","((a)*+(b)*)","(((a)*+(b)*))*","(((ab)*+(bb)*))*","abcd","(a)*(b)*","((a)*(b)*)*","(((a)*(b)*)*)*","((((a)*(b)*)*)*+(((a)*(b)*)*)*)"
-	//	,"((((a)*(b)*)*)*+(((a)*(b)*)*)*)c","((((a)*(b)*)*)*+(((a)*(b)*)*)*c)","a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)" };
+	//	,"((((a)*(b)*)*)*+(((a)*(b)*)*)*)c","((((a)*(b)*)*)*+(((a)*(b)*)*)*c)","a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)","ab((a+c))*" };
 
 	//for (int i = 0; i < 23; i++)
 	//{

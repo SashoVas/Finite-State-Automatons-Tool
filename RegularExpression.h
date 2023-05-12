@@ -20,6 +20,11 @@ private:
 	void copyFrom(const RegularExpression& other);
 	void moveFrom(RegularExpression&& other);
 
+	static RegularExpression* getSymbolRegEX(char value);
+	static RegularExpression* extend(RegularExpression* result, Type type);
+	static RegularExpression* buildRegex(const MyString& str, int& currentPosition);
+	static RegularExpression* getShallowCopyOf(const RegularExpression& other);
+	static RegularExpression* getLeftSubtreeOf(RegularExpression* result);
 public:
 
 
@@ -27,6 +32,7 @@ public:
 	RegularExpression(RegularExpression&& other);
 	~RegularExpression();
 	RegularExpression(const MyString& str);
+	RegularExpression(char value);
 
 	RegularExpression& operator=(const RegularExpression& other);
 	RegularExpression& operator=(RegularExpression&& other);
@@ -34,17 +40,27 @@ public:
 	Type getType()const;
 	MyString getRegEx()const;
 	char getValue()const;
+	bool isEpsilon()const;
+	bool isEmpty()const;
+	void setValue(char value);
 
 	void printRegEx()const;
 	const RegularExpression& getLeft()const;
 	const RegularExpression& getRight()const;
-	static RegularExpression* getSymbolRegEX(char value);
-	static RegularExpression* extend(RegularExpression* result, Type type);
-	static RegularExpression* buildRegex(const MyString& str, int& currentPosition);
+
+
+
+	void UnionWith(const RegularExpression& other);
+	void ConcatenationWith(const RegularExpression& other);
+	void KleeneStar();
 };
 
 RegularExpression::RegularExpression(RegularExpression&& other) {
 	moveFrom(std::move(other));
+}
+RegularExpression::RegularExpression(char value) {
+	this->value = value;
+	type = Type::Symbol;
 }
 
 RegularExpression::RegularExpression(const RegularExpression& other) {
@@ -113,6 +129,9 @@ RegularExpression::RegularExpression(const MyString& str) {
 	regEx->right = nullptr;
 	delete regEx;
 }
+void RegularExpression::setValue(char value) {
+	this->value = value;
+}
 
 RegularExpression::Type RegularExpression::getType()const {
 	return type;
@@ -164,7 +183,14 @@ const RegularExpression& RegularExpression::getLeft()const {
 const RegularExpression& RegularExpression::getRight()const {
 	return *right;
 }
-RegularExpression* RegularExpression::getSymbolRegEX(char value) {
+bool RegularExpression::isEpsilon()const {
+	return type == Type::Symbol && value == '$';
+}
+bool RegularExpression::isEmpty()const {
+	return type == Type::Symbol && value == '\0';
+}
+
+RegularExpression* RegularExpression::getSymbolRegEX(char value){
 	RegularExpression* val = new RegularExpression();
 	val->value = value;
 	val->type = Type::Symbol;
@@ -176,6 +202,13 @@ RegularExpression* RegularExpression::extend(RegularExpression* result, Type typ
 	newResult->type = type;
 	return newResult;
 }
+RegularExpression* RegularExpression::getLeftSubtreeOf(RegularExpression* result) {
+	RegularExpression* lhs = result->left;
+	result->left = nullptr;
+	delete result;
+	return lhs;
+}
+
 RegularExpression* RegularExpression::buildRegex(const MyString& str, int& currentPosition) {
 	RegularExpression* result = new RegularExpression();
 	if (str[currentPosition] == '(')
@@ -201,10 +234,7 @@ RegularExpression* RegularExpression::buildRegex(const MyString& str, int& curre
 		currentPosition++;
 		if (currentPosition<str.length() && str[currentPosition] == ')')
 		{
-			RegularExpression* lhs = result->left;
-			result->left = nullptr;
-			delete result;
-			return lhs;
+			return getLeftSubtreeOf(result);
 		}
 	}
 
@@ -224,10 +254,7 @@ RegularExpression* RegularExpression::buildRegex(const MyString& str, int& curre
 		}
 		else if (str[currentPosition] == ')')
 		{
-			RegularExpression* lhs = result->left;
-			result->left = nullptr;
-			delete result;
-			return lhs;
+			return getLeftSubtreeOf(result);
 		}
 		else if (str[currentPosition] == '+') {
 
@@ -244,8 +271,58 @@ RegularExpression* RegularExpression::buildRegex(const MyString& str, int& curre
 			result = extend(result, Type::Concatenation);
 		}
 	}
-	RegularExpression* lhs = result->left;
-	result->left = nullptr;
-	delete result;
-	return lhs;
+	return getLeftSubtreeOf(result);
+}
+RegularExpression* RegularExpression::getShallowCopyOf(const RegularExpression& other) {
+	RegularExpression* copy = new RegularExpression();
+	copy->left = other.left;
+	copy->right = other.right;
+	copy->value = other.value;
+	copy->type = other.type;
+	return copy;
+}
+void RegularExpression::UnionWith(const RegularExpression& other) {
+	if (other.isEmpty())
+		return;
+	if (isEmpty())
+	{
+		*this = other;
+		return;
+	}
+	if (type==Type::Symbol && other.type == Type::Symbol && value==other.value)
+		return;
+	if (getRegEx()==other.getRegEx())
+		return;
+	RegularExpression* lhs = getShallowCopyOf(*this);
+	type = Type::Union;
+	value='\0';
+	left = lhs;
+	RegularExpression* rhs = new RegularExpression(other);
+	right = rhs;
+}
+void RegularExpression::ConcatenationWith(const RegularExpression& other) {
+	if (other.isEmpty()||other.isEpsilon())
+		return;
+	if (isEmpty()||isEpsilon())
+	{
+		*this = other;
+		return;
+	}
+	RegularExpression* lhs = getShallowCopyOf(*this);
+	type = Type::Concatenation;
+	value = '\0';
+	left = lhs;
+	RegularExpression* rhs = new RegularExpression(other);
+	right = rhs;
+}
+void RegularExpression::KleeneStar() {
+	if (type==Type::KleeneStar|| isEmpty()||isEpsilon())
+	{
+		return;
+	}
+	RegularExpression* lhs = getShallowCopyOf(*this);
+	right = nullptr;
+	type = Type::KleeneStar;
+	value = '\0';
+	left = lhs;
 }
