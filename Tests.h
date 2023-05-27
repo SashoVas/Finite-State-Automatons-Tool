@@ -15,6 +15,7 @@ public:
 	static bool runAutomatonConcatenationTests();
 	static bool runAutomatonKleeneStarTests();
 	static bool runAutomatonComplementTests();
+	static bool runAutomatonIntersectionTests();
 
 	static bool runAutomatonFunctionsTests();
 	static bool runAutomatonTotalizationTests();
@@ -164,6 +165,33 @@ bool Tests::runAutomatonComplementTests() {
 
 	return true;
 }
+bool Tests::runAutomatonIntersectionTests() {
+	//Arange
+	RegularExpression firstRegEx("((a)*bab(c)*)*");
+	RegularExpression secondRegEx("b(a)*bc(c)*");
+	FiniteAutomata firstAutomaton(firstRegEx);
+	FiniteAutomata secondAutomaton(secondRegEx);
+	//Act
+	FiniteAutomata result = Intersection(firstAutomaton, secondAutomaton);
+	//Assert
+	std::cout << result.accept("babc") << std::endl;
+	std::cout << result.accept("babccc") << std::endl;
+
+	std::cout << !result.accept("ababc") << std::endl;
+	std::cout << !result.accept("ababcababc") << std::endl;
+	std::cout << !result.accept("abab") << std::endl;
+	std::cout << !result.accept("aaaaaaabab") << std::endl;
+	std::cout << !result.accept("aaaaaaababc") << std::endl;
+	std::cout << !result.accept("abababab") << std::endl;
+	std::cout << !result.accept("bab") << std::endl;
+	std::cout << !result.accept("baaaaab") << std::endl;
+	std::cout << !result.accept("baaaaabc") << std::endl;
+	std::cout << !result.accept("baaaaabcccc") << std::endl;
+	std::cout << !result.accept("babbab") << std::endl;
+	std::cout << !result.accept("") << std::endl;
+
+	return true;
+}
 bool Tests::runAutomatonTotalizationTests() {
 	//Arange
 	RegularExpression firstRegEx("(a+b)*cd");
@@ -284,6 +312,8 @@ bool Tests::runAutomatonOperationsTests() {
 	runAutomatonKleeneStarTests();
 	std::cout << "Complement tests:" << std::endl;
 	runAutomatonComplementTests();
+	std::cout << "Intersection tests:" << std::endl;
+	runAutomatonIntersectionTests();
 	return true;
 }
 bool Tests::runAutomatonFunctionsTests() {
