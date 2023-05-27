@@ -55,7 +55,8 @@ public:
 	FiniteAutomata& ConcatenationWith(const const FiniteAutomata& rhs);
 	FiniteAutomata& KleeneStar();
 	FiniteAutomata& Complement();
-	FiniteAutomata& IntersectWith(const const FiniteAutomata& rhs);//The automatons should have the same alphabet
+	FiniteAutomata& IntersectWith(const FiniteAutomata& rhs);//The automatons should have the same alphabet
+	FiniteAutomata& DifferenceWith(const FiniteAutomata& rhs);
 
 	FiniteAutomata getReverse();
 
@@ -70,6 +71,7 @@ FiniteAutomata Concatenation(const FiniteAutomata& lhs, const FiniteAutomata& rh
 FiniteAutomata KleeneStar(const FiniteAutomata& lhs);
 FiniteAutomata Complement(const FiniteAutomata& lhs);
 FiniteAutomata Intersection(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
+FiniteAutomata Difference(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
 
 FiniteAutomata::FiniteAutomata(int size) {
 	startNode = 0;
@@ -198,6 +200,11 @@ FiniteAutomata Intersection(const FiniteAutomata& lhs, const FiniteAutomata& rhs
 	result.IntersectWith(rhs);
 	return result;
 }
+FiniteAutomata Difference(const FiniteAutomata& lhs, const FiniteAutomata& rhs) {
+	FiniteAutomata result(lhs);
+	result.DifferenceWith(rhs);
+	return result;
+}
 FiniteAutomata& FiniteAutomata::KleeneStar() {
 	for (int i = 0; i < finalStates.getSize(); i++)
 	{
@@ -280,11 +287,15 @@ FiniteAutomata& FiniteAutomata::Complement() {
 	return *this;
 }
 FiniteAutomata& FiniteAutomata::IntersectWith(const const FiniteAutomata& rhs) {
-	FiniteAutomata rhsComp = FiniteAutomata(rhs);
-	rhsComp.Complement();
+	FiniteAutomata rhsComp = FiniteAutomata(rhs).Complement();
 	Complement();
 	UnionWith(rhsComp);
 	Complement();
+	return *this;
+}
+FiniteAutomata& FiniteAutomata::DifferenceWith(const FiniteAutomata& rhs) {
+	FiniteAutomata rhsComp = FiniteAutomata(rhs).Complement();
+	IntersectWith(rhsComp);
 	return *this;
 }
 FiniteAutomata FiniteAutomata::buildFromRegex(const RegularExpression& regEx) {

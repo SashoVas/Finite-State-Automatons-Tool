@@ -4,7 +4,5 @@
 #include "FiniteAutomata.h"
 int main()
 {
-	//Tests::runAllTests();
-	Tests::runAutomatonIntersectionTests();
-
+	Tests::runAllTests();
 }

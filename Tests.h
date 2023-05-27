@@ -16,6 +16,7 @@ public:
 	static bool runAutomatonKleeneStarTests();
 	static bool runAutomatonComplementTests();
 	static bool runAutomatonIntersectionTests();
+	static bool runAutomatonDifferenceTests();
 
 	static bool runAutomatonFunctionsTests();
 	static bool runAutomatonTotalizationTests();
@@ -192,6 +193,37 @@ bool Tests::runAutomatonIntersectionTests() {
 
 	return true;
 }
+bool Tests::runAutomatonDifferenceTests() {
+	//Arange
+	RegularExpression firstRegEx("(a+b)*");
+	RegularExpression secondRegEx("((a+b)*aba(a+b)*)");
+	FiniteAutomata firstAutomaton(firstRegEx);
+	FiniteAutomata secondAutomaton(secondRegEx);
+	//Act
+	FiniteAutomata result = Difference(firstAutomaton, secondAutomaton);
+	//Assert
+	std::cout << result.accept("aaaaaabbaaabbaaabbaa") << std::endl;
+	std::cout << result.accept("bab") << std::endl;
+	std::cout << result.accept("bbaabbabbaaabbabbaabbaaa") << std::endl;
+	std::cout << result.accept("aaaaaaaaaaaa") << std::endl;
+	std::cout << result.accept("bbbbbbb") << std::endl;
+	std::cout << result.accept("a") << std::endl;
+	std::cout << result.accept("b") << std::endl;
+	std::cout << result.accept("ba") << std::endl;
+	std::cout << result.accept("ab") << std::endl;
+	std::cout << result.accept("") << std::endl;
+
+	std::cout << !result.accept("aba") << std::endl;
+	std::cout << !result.accept("babab") << std::endl;
+	std::cout << !result.accept("baba") << std::endl;
+	std::cout << !result.accept("abab") << std::endl;
+	std::cout << !result.accept("aaaaaabaaaaaaaaaaa") << std::endl;
+	std::cout << !result.accept("abaaaabbabaababababaaba") << std::endl;
+	std::cout << !result.accept("bbbbbbbbababbbbbbbbbbbb") << std::endl;
+	std::cout << !result.accept("abaabaaaababbbaaba") << std::endl;
+	std::cout << !result.accept("bbabaabbbaabaababa") << std::endl;
+	return true;
+}
 bool Tests::runAutomatonTotalizationTests() {
 	//Arange
 	RegularExpression firstRegEx("(a+b)*cd");
@@ -314,6 +346,8 @@ bool Tests::runAutomatonOperationsTests() {
 	runAutomatonComplementTests();
 	std::cout << "Intersection tests:" << std::endl;
 	runAutomatonIntersectionTests();
+	std::cout << "Difference tests:" << std::endl;
+	runAutomatonDifferenceTests();
 	return true;
 }
 bool Tests::runAutomatonFunctionsTests() {
