@@ -14,6 +14,7 @@ public:
 	static bool runAutomatonUnionTests();
 	static bool runAutomatonConcatenationTests();
 	static bool runAutomatonKleeneStarTests();
+	static bool runAutomatonComplementTests();
 
 	static bool runAutomatonFunctionsTests();
 	static bool runAutomatonTotalizationTests();
@@ -57,19 +58,6 @@ bool Tests::runRegularExpressionGetRegExTests() {
 	std::cout<< (RegularExpression("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)").getRegEx() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
 	std::cout<< (RegularExpression("ab(a+c)*").getRegEx() == "ab((a+c))*") << std::endl;
 
-	//MyString inputs[64] = { "a(a+b)*b+b(a+b)*a","a","ab","ab+ac","(ab+ac)*","(ab+ac)*+a","(ab+ac)*+a+b","(ab+ac)*+a+ba","((ab+ac)*+a+ba)c"
-	//,"((ab+ac)*+a+ba)c+d","((ab+ac)*+a+ba)c+d+b","((ab+ac)*+a+ba)c+d+(b)*","(a)*","(a)*+(b)*","((a)*+(b)*)*","((ab)*+(bb)*)*","abcd","(a)*(b)*"
-	//,"((a)*(b)*)*","(((a)*(b)*)*)*","(((a)*(b)*)*)*+(((a)*(b)*)*)*","((((a)*(b)*)*)*+(((a)*(b)*)*)*)c","(((a)*(b)*)*)*+(((a)*(b)*)*)*c","a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)","ab(a+c)*" };
-
-	//MyString outputs[64] = { "(a((a+b))*b+b((a+b))*a)" ,"a","ab", "(ab+ac)","((ab+ac))*","(((ab+ac))*+a)","(((ab+ac))*+(a+b))"
-	//	,"(((ab+ac))*+(a+ba))","(((ab+ac))*+(a+ba))c","((((ab+ac))*+(a+ba))c+d)","((((ab+ac))*+(a+ba))c+(d+b))","((((ab+ac))*+(a+ba))c+(d+(b)*))"
-	//,"(a)*","((a)*+(b)*)","(((a)*+(b)*))*","(((ab)*+(bb)*))*","abcd","(a)*(b)*","((a)*(b)*)*","(((a)*(b)*)*)*","((((a)*(b)*)*)*+(((a)*(b)*)*)*)"
-	//	,"((((a)*(b)*)*)*+(((a)*(b)*)*)*)c","((((a)*(b)*)*)*+(((a)*(b)*)*)*c)","a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)","ab((a+c))*" };
-
-	//for (int i = 0; i < 23; i++)
-	//{
-	//	std::cout << (RegularExpression(inputs[i]).getRegEx() == outputs[i])<<std::endl;
-	//}
 	return true;
 }
 bool Tests::runAutomatonUnionTests() {
@@ -145,6 +133,35 @@ bool Tests::runAutomatonKleeneStarTests() {
 	std::cout << result.accept("bababaabbaaabbba") << std::endl;
 	std::cout << result.accept("abaaabbbbaaba") << std::endl;
 	std::cout << result.accept("") << std::endl;
+	return true;
+}
+bool Tests::runAutomatonComplementTests() {
+	//Arange
+	RegularExpression firstRegEx("(a+b)*(c+d)+ca");
+	FiniteAutomata result(firstRegEx);
+	//Act
+	result.Complement();
+	//Assert
+	std::cout << result.accept("a") << std::endl;
+	std::cout << result.accept("b") << std::endl;
+	std::cout << result.accept("ab") << std::endl;
+	std::cout << result.accept("ccc") << std::endl;
+	std::cout << result.accept("ddd") << std::endl;
+	std::cout << result.accept("acac") << std::endl;
+	std::cout << result.accept("abab") << std::endl;
+	std::cout << result.accept("adad") << std::endl;
+	std::cout << result.accept("bdbd") << std::endl;
+	std::cout << result.accept("baba") << std::endl;
+	std::cout << result.accept("bcbc") << std::endl;
+	std::cout << result.accept("") << std::endl;
+
+	std::cout << !result.accept("abc") << std::endl;
+	std::cout << !result.accept("ac") << std::endl;
+	std::cout << !result.accept("ad") << std::endl;
+	std::cout << !result.accept("bd") << std::endl;
+	std::cout << !result.accept("bc") << std::endl;
+	std::cout << !result.accept("ca") << std::endl;
+
 	return true;
 }
 bool Tests::runAutomatonTotalizationTests() {
@@ -265,6 +282,8 @@ bool Tests::runAutomatonOperationsTests() {
 	runAutomatonConcatenationTests();
 	std::cout << "KleeneStar tests:" << std::endl;
 	runAutomatonKleeneStarTests();
+	std::cout << "Complement tests:" << std::endl;
+	runAutomatonComplementTests();
 	return true;
 }
 bool Tests::runAutomatonFunctionsTests() {

@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include "CustomCollection.h"
+#include "CustomCollection.hpp"
 class FiniteAutomata {
 public:
 	struct Transition {
@@ -37,6 +37,7 @@ public:
 	FiniteAutomata() = default;
 	FiniteAutomata(char symbol);
 	FiniteAutomata(const RegularExpression& regEx);
+	FiniteAutomata(const char* regEx);
 
 	void addState();
 	void changeStart(int index);
@@ -53,6 +54,7 @@ public:
 	FiniteAutomata& UnionWith(const const FiniteAutomata& rhs);
 	FiniteAutomata& ConcatenationWith(const const FiniteAutomata& rhs);
 	FiniteAutomata& KleeneStar();
+	FiniteAutomata& Complement();
 
 	FiniteAutomata getReverse();
 
@@ -65,6 +67,7 @@ public:
 FiniteAutomata Union(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
 FiniteAutomata Concatenation(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
 FiniteAutomata KleeneStar(const FiniteAutomata& lhs);
+FiniteAutomata Complement(const FiniteAutomata& lhs);
 
 FiniteAutomata::FiniteAutomata(int size) {
 	startNode = 0;
@@ -93,6 +96,9 @@ FiniteAutomata::FiniteAutomata(const RegularExpression& regEx) {
 	startNode = toReplace.startNode;
 
 }
+FiniteAutomata::FiniteAutomata(const char* regEx):FiniteAutomata(RegularExpression(regEx)) {
+}
+
 void FiniteAutomata::addToAlphabet(char symbol) {
 	if (alphabet.find(symbol) != -1)
 		return;
@@ -180,7 +186,11 @@ FiniteAutomata KleeneStar(const FiniteAutomata& lhs) {
 	result.KleeneStar();
 	return result;
 }
-
+FiniteAutomata Complement(const FiniteAutomata& lhs) {
+	FiniteAutomata result(lhs);
+	result.Complement();
+	return result;
+}
 FiniteAutomata& FiniteAutomata::KleeneStar() {
 	for (int i = 0; i < finalStates.getSize(); i++)
 	{
@@ -246,6 +256,20 @@ FiniteAutomata& FiniteAutomata::ConcatenationWith(const const FiniteAutomata& rh
 		finalStates.add(rhs.finalStates[i] + initialNodes);
 	multiplStarts = false;
 
+	return *this;
+}
+FiniteAutomata& FiniteAutomata::Complement() {
+	makeDeterministic();
+	//makeTotal();
+	CustomCollection<int>newFinals;
+	for (int i = 0; i < nodes; i++)
+	{
+		if (finalStates.find(i)==-1)
+		{
+			newFinals.add(i);
+		}
+	}
+	finalStates = std::move(newFinals);
 	return *this;
 }
 
@@ -339,10 +363,6 @@ void FiniteAutomata::makeDeterministic() {
 	CustomCollection<int>newStart;
 	if (multiplStarts)
 	{
-		//for (int i = 0; i < automata[startNode].getSize(); i++)
-		//{
-		//	newStart.add(automata[startNode][i].dest);
-		//}
 		newStart = startStates;
 	}
 	else
