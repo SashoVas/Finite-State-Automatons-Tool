@@ -23,7 +23,7 @@ public:
 	static bool runAutomatonDeterminizationTests();
 	static bool runAutomatonMinimizationTests();
 	static bool runAutomatonReverseTests();
-
+	static bool isEmptyLanguageTests();
 };
 
 bool Tests::runRegularExpressionTests() {
@@ -359,6 +359,8 @@ bool Tests::runAutomatonFunctionsTests() {
 	runAutomatonReverseTests();
 	std::cout << "Minimization tests:" << std::endl;
 	runAutomatonMinimizationTests();
+	std::cout << "Is empty language tests:" << std::endl;
+	isEmptyLanguageTests();
 	return true;
 }
 bool Tests::runAutomatonTests() {
@@ -373,5 +375,19 @@ bool Tests::runAllTests() {
 	runRegularExpressionTests();
 	std::cout << "Automaton tests:" << std::endl;
 	runAutomatonTests();
+	return true;
+}
+bool Tests::isEmptyLanguageTests() {
+	//Arange
+	RegularExpression firstRegEx("a+b");
+	FiniteAutomata firstAutomaton(firstRegEx);
+	FiniteAutomata secondAutomaton(firstRegEx);
+	firstAutomaton.DifferenceWith(secondAutomaton);
+	//Act
+	bool result=firstAutomaton.isEmptyLanguage();
+	bool result2= secondAutomaton.isEmptyLanguage();
+	//Assert
+	std::cout << result << std::endl;
+	std::cout << !result2 << std::endl;
 	return true;
 }

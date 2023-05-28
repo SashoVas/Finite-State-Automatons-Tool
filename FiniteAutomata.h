@@ -40,12 +40,17 @@ public:
 	FiniteAutomata(const RegularExpression& regEx);
 	FiniteAutomata(const char* regEx);
 
+	void writeToFile()const;
+	void readFromFile();
+
 	void addState();
 	void changeStart(int index);
 	void addTransition(int index, const Transition& transition);
 	void makeFinal(int index);
 
 	RegularExpression getRegEx()const;
+	FiniteAutomata getReverse()const;
+	bool isEmptyLanguage()const;
 
 	void makeDeterministic();
 	void makeTotal();
@@ -58,8 +63,6 @@ public:
 	FiniteAutomata& Complement();
 	FiniteAutomata& IntersectWith(const FiniteAutomata& rhs);//The automatons should have the same alphabet
 	FiniteAutomata& DifferenceWith(const FiniteAutomata& rhs);
-
-	FiniteAutomata getReverse();
 
 	void print()const;
 	bool accept(const MyString& word, int currentLetter = 0, int node = -1)const;
@@ -571,7 +574,7 @@ bool FiniteAutomata::accept(const MyString& word, int currentLetter, int node)co
 	}
 	return false;
 }
-FiniteAutomata FiniteAutomata::getReverse() {
+FiniteAutomata FiniteAutomata::getReverse() const{
 	FiniteAutomata result(nodes);
 	result.alphabet = alphabet;
 	for (int i = 0; i < nodes; i++)
@@ -614,4 +617,33 @@ void FiniteAutomata::minimize() {
 	reverse();
 	makeDeterministic();
 	multiplStarts = false;
+}
+bool FiniteAutomata::isEmptyLanguage()const {
+	MyQueue<int>queue;
+	queue.push(startNode);
+	bool* visited = new bool[nodes];
+	for (int i = 0; i < nodes; i++)
+	{
+		visited[i] = false;
+	}
+	while (!queue.isEmpty())
+	{
+		int current = queue.peek();
+		queue.pop();
+		for (int i = 0; i < automata[current].getSize(); i++)
+		{	
+			if (visited[automata[current][i].dest])
+				continue;
+
+			if (finalStates.find(automata[current][i].dest)!=-1)
+			{
+				delete[] visited;
+				return false;
+			}
+			queue.push(automata[current][i].dest);
+			visited[automata[current][i].dest] = true;
+		}
+	}
+	delete [] visited;
+	return true;
 }
