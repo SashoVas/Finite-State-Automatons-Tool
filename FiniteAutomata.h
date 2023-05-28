@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include "CustomCollection.hpp"
+#include "MyQueue.hpp"
 class FiniteAutomata {
 public:
 	struct Transition {
@@ -384,7 +385,7 @@ void FiniteAutomata::makeDeterministic() {
 	FiniteAutomata newAutomaton;
 
 	CustomCollection<StateTuple>stateTable(64);
-	CustomCollection<int>queue;
+	MyQueue<int>queue;
 	CustomCollection<int>newStart;
 	if (multiplStarts)
 	{
@@ -392,18 +393,17 @@ void FiniteAutomata::makeDeterministic() {
 	}
 	else
 		newStart.add(startNode);
-	queue.add(0);
+	queue.push(0);
 	stateTable.add(StateTuple(std::move(newStart), 0));
 	newAutomaton.addState();
 	if (finalStates.find(startNode) != -1)
 	{
 		newAutomaton.makeFinal(0);
 	}
-	int currentCount = 0;
-	while (queue.getSize() - currentCount > 0)
+	while (!queue.isEmpty())
 	{
-		int currentInNew = queue[currentCount];
-
+		int currentInNew = queue.peek();
+		queue.pop();
 		CustomCollection<int>& currentStates = stateTable[findInTableByNode(currentInNew, stateTable)].states;
 		for (int i = 0; i < alphabet.getSize(); i++)
 		{
@@ -413,7 +413,7 @@ void FiniteAutomata::makeDeterministic() {
 			if (nextStatesPositionInTable == -1)
 			{
 				newAutomaton.addState();
-				queue.add(newAutomaton.nodes - 1);
+				queue.push(newAutomaton.nodes - 1);
 				if (haveFinal(nextStates))
 				{
 					newAutomaton.makeFinal(newAutomaton.nodes - 1);
@@ -427,7 +427,6 @@ void FiniteAutomata::makeDeterministic() {
 			}
 
 		}
-		currentCount++;
 	}
 	newAutomaton.makeTotal();
 	*this = std::move(newAutomaton);
