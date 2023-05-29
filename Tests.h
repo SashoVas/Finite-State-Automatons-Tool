@@ -1,6 +1,7 @@
 #pragma once
 #include "RegularExpression.h"
 #include "FiniteAutomata.h"
+#include "BitSet.h"
 class Tests {
 public:
 	static bool runAllTests();
@@ -24,6 +25,10 @@ public:
 	static bool runAutomatonMinimizationTests();
 	static bool runAutomatonReverseTests();
 	static bool isEmptyLanguageTests();
+
+	static bool runCollectionsTests();
+	static bool runBitSetCheckAndToggleTests();
+	static bool runBitSetAddAndResizeTests();
 };
 
 bool Tests::runRegularExpressionTests() {
@@ -371,6 +376,8 @@ bool Tests::runAutomatonTests() {
 	return true;
 }
 bool Tests::runAllTests() {
+	std::cout << "Collection tests:" << std::endl;
+	runCollectionsTests();
 	std::cout << "RegEx tests:" << std::endl;
 	runRegularExpressionTests();
 	std::cout << "Automaton tests:" << std::endl;
@@ -389,5 +396,54 @@ bool Tests::isEmptyLanguageTests() {
 	//Assert
 	std::cout << result << std::endl;
 	std::cout << !result2 << std::endl;
+	return true;
+}
+bool Tests::runCollectionsTests() {
+	std::cout << "BitSet tests:" << std::endl;
+	std::cout << "BitSet toggle and check Tests:" << std::endl;
+	runBitSetCheckAndToggleTests();
+	std::cout << "BitSet add and resize Tests:" << std::endl;
+	runBitSetAddAndResizeTests();
+	return true;
+}
+bool Tests::runBitSetCheckAndToggleTests()
+{
+	//Arange
+	BitSet bitSet(64);
+	//Act
+	for (int i = 0; i < 64; i+=2)
+	{
+		bitSet.toggle(i);
+	}
+	//Assert
+	for (int i = 0; i < 64; i++)
+	{
+		if (i%2==bitSet.check(i))
+		{
+			std::cout << 0 << std::endl;
+			return false;
+		}
+	}
+	std::cout << 1 << std::endl;
+	return true;
+}
+bool Tests::runBitSetAddAndResizeTests() {
+	//Arange
+	BitSet bitSet(2);
+	//Act
+	for (int i = 0; i < 1000; i++)
+	{
+		bitSet.add(i % 2);
+	}
+	//Assert
+	for (int i = 2; i < 1000; i++)
+	{
+		if (bitSet.check(i)!=i%2)
+		{
+			std::cout << 0 << std::endl;
+			return false;
+		}
+	}
+	std::cout << 1 << std::endl;
 	return true;
 }

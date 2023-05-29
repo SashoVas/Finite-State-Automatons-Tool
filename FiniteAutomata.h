@@ -387,7 +387,7 @@ void FiniteAutomata::makeDeterministic() {
 
 	FiniteAutomata newAutomaton;
 
-	CustomCollection<StateTuple>stateTable(64);
+	CustomCollection<StateTuple>stateTable(128);
 	MyQueue<int>queue;
 	CustomCollection<int>newStart;
 	if (multiplStarts)
@@ -621,11 +621,8 @@ void FiniteAutomata::minimize() {
 bool FiniteAutomata::isEmptyLanguage()const {
 	MyQueue<int>queue;
 	queue.push(startNode);
-	bool* visited = new bool[nodes];
-	for (int i = 0; i < nodes; i++)
-	{
-		visited[i] = false;
-	}
+	bool* visited = new bool[nodes] {false};
+
 	while (!queue.isEmpty())
 	{
 		int current = queue.peek();

@@ -4,5 +4,5 @@
 #include "FiniteAutomata.h"
 int main()
 {
-	Tests::isEmptyLanguageTests();
+	Tests::runAllTests();
 }
