@@ -3,6 +3,7 @@
 class BitSet {
 	int size = 0;
 	int capacity = 0;
+	int truesCount = 0;
 	char* data=nullptr;
 	void copyFrom(const BitSet& other);
 	void moveFrom(BitSet&& other);
@@ -23,7 +24,13 @@ public:
 	void toggle(int index);
 	void add(bool mode=false);
 	bool check(int index)const;
+	void empty();
+
+	int getTruesCount()const;
 };
+int BitSet::getTruesCount()const {
+	return truesCount;
+}
 int BitSet::getBucketsCount()const {
 	return (capacity + 1 ) / 8 + 1;
 }
@@ -38,7 +45,8 @@ void BitSet::copyFrom(const BitSet& other) {
 	capacity = other.capacity;
 	size = other.size;
 	data = new char[other.getBucketsCount()]{ 0 };
-	for (int i = 0; i < size; i++)
+	truesCount = other.truesCount;
+	for (int i = 0; i < getBucketsCount(); i++)
 	{
 		data[i] = other.data[i];
 	}
@@ -48,19 +56,21 @@ void BitSet::moveFrom(BitSet&& other) {
 	size = other.size;
 	data = other.data;
 	other.data = nullptr;
+	truesCount = other.truesCount;
 }
 void BitSet::free() {
 	delete [] data;
 	data = nullptr;
 	size = 0;
 	capacity = 0;
+	truesCount = 0;
 }
 BitSet::BitSet() :BitSet(8) {
 
 }
 BitSet::BitSet(int size) {
 	capacity = size*2;
-	size = size;
+	this->size = size;
 	data = new char[getBucketsCount()]{0};
 }
 BitSet::~BitSet() {
@@ -91,7 +101,6 @@ BitSet& BitSet::operator=(BitSet&& other) {
 void BitSet::resize(int newCapacity) {
 	capacity = newCapacity;
 
-	int a = getBucketsCount();
 	char* newData = new char[getBucketsCount()]{0};
 
 	for (int i = 0; i < getBucketsCount(); i++)
@@ -109,10 +118,18 @@ void BitSet::toggle(int index) {
 		throw std::invalid_argument("Invalid argument");
 	}
 	int positionMask = getBucketPositionMask(index);
+	if (!(positionMask & data[bucketIndex]))
+	{
+		truesCount++;
+	}
+	else
+	{
+		truesCount--;
+	}
 	data[bucketIndex] ^= positionMask;
 }
 void BitSet::add(bool mode) {
-	if (size>=capacity-1)
+	if (size>=capacity)
 	{
 		resize(capacity*2);
 	}
@@ -126,4 +143,11 @@ bool BitSet::check(int index)const {
 	int bucketIndex = getBucketIndex(index);
 	int positionMask = getBucketPositionMask(index);
 	return positionMask & data[bucketIndex];
+}
+void BitSet::empty() {
+	for (int i = 0; i < getBucketsCount(); i++)
+	{
+		data[i] = 0;
+	}
+	truesCount = 0;
 }

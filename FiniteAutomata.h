@@ -2,6 +2,7 @@
 #include <iostream>
 #include "CustomCollection.hpp"
 #include "MyQueue.hpp"
+#include "BitSet.h"
 class FiniteAutomata {
 public:
 	struct Transition {
@@ -18,7 +19,8 @@ private:
 	int startNode = 0;
 
 	CustomCollection <CustomCollection<Transition>> automata;
-	CustomCollection<int> finalStates;
+	//CustomCollection<int> finalStates;
+	BitSet finalStates;
 	CustomCollection<int> startStates;
 	bool multiplStarts = false;
 	CustomCollection<char> alphabet;
@@ -77,7 +79,7 @@ FiniteAutomata Complement(const FiniteAutomata& lhs);
 FiniteAutomata Intersection(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
 FiniteAutomata Difference(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
 
-FiniteAutomata::FiniteAutomata(int size) {
+FiniteAutomata::FiniteAutomata(int size):automata(size),finalStates(size) {
 	startNode = 0;
 	nodes = size;
 	for (int i = 0; i < size; i++)
@@ -92,7 +94,9 @@ FiniteAutomata::FiniteAutomata(char symbol) {
 	automata.add(t);
 	automata.add(CustomCollection<Transition>());
 	nodes = 2;
-	finalStates.add(1);
+	finalStates.add();
+	finalStates.add();
+	finalStates.toggle(1);
 	alphabet.add(symbol);
 }
 FiniteAutomata::FiniteAutomata(const RegularExpression& regEx) {
@@ -102,7 +106,8 @@ FiniteAutomata::FiniteAutomata(const RegularExpression& regEx) {
 	alphabet = std::move(toReplace.alphabet);
 	nodes = toReplace.nodes;
 	startNode = toReplace.startNode;
-
+	multiplStarts = toReplace.multiplStarts;
+	startStates = std::move(toReplace.startStates);
 }
 FiniteAutomata::FiniteAutomata(const char* regEx):FiniteAutomata(RegularExpression(regEx)) {
 }
@@ -122,11 +127,25 @@ void FiniteAutomata::addTransition(int index, const Transition& transition) {
 void FiniteAutomata::makeFinal(int index) {
 	if (index >= nodes)
 		throw std::invalid_argument("Invalid argument");
-	finalStates.add(index);
+	//finalStates.add(index);
+	finalStates.toggle(index);
 }
 
 void FiniteAutomata::print()const {
-	std::cout << "Start node:" << startNode << std::endl;
+	if (multiplStarts)
+	{
+		std::cout << "Start nodes:" << std::endl;
+		for (int i = 0; i < startStates.getSize(); i++)
+		{
+			std::cout << i << ',';
+		}
+		std::cout << std::endl;
+	}
+	else
+	{
+		std::cout << "Start node:" << startNode << std::endl;
+	}
+
 	std::cout << "Nodes:" << nodes << std::endl;
 	std::cout << "Alphabet:";
 	for (int i = 0; i < alphabet.getSize(); i++)
@@ -144,16 +163,21 @@ void FiniteAutomata::print()const {
 		}
 		std::cout << std::endl;
 	}
-	std::cout << "Final states:";
-	for (int i = 0; i < finalStates.getSize(); i++)
+	std::cout << "Final states("<<finalStates.getTruesCount()<<"):";
+	for (int i = 0; i < nodes; i++)
 	{
-		std::cout << finalStates[i] << ",";
+		if (finalStates.check(i))
+		{
+			std::cout << i << ",";
+		}
+		//std::cout << finalStates[i] << ",";
 	}
 	std::cout << std::endl;
 }
 
 void FiniteAutomata::addState() {
 	automata.add(CustomCollection<Transition>());
+	finalStates.add();
 	nodes++;
 }
 
@@ -210,20 +234,24 @@ FiniteAutomata Difference(const FiniteAutomata& lhs, const FiniteAutomata& rhs) 
 	return result;
 }
 FiniteAutomata& FiniteAutomata::KleeneStar() {
-	for (int i = 0; i < finalStates.getSize(); i++)
+	for (int i = 0; i < nodes; i++)
 	{
+		if (!finalStates.check(i))
+		{
+			continue;
+		}
 		for (int j = 0; j < automata[startNode].getSize(); j++)
 		{
-			if (finalStates[i] == startNode)
+			if (i == startNode)
 				continue;
-			automata[finalStates[i]].add(
+			automata[i].add(
 				FiniteAutomata::Transition(automata[startNode][j].dest
 					, automata[startNode][j].symbol));
 		}
 	}
 
-	if (finalStates.find(startNode) == -1)
-		finalStates.add(startNode);
+	if (!finalStates.check(startNode) )
+		finalStates.toggle(startNode);
 	multiplStarts = false;
 	return *this;
 }
@@ -232,17 +260,22 @@ FiniteAutomata& FiniteAutomata::UnionWith(const const FiniteAutomata& rhs) {
 	int intitialNodes = nodes;
 	combine(rhs);
 
-	for (int i = 0; i < rhs.finalStates.getSize(); i++)
-		finalStates.add(rhs.finalStates[i] + intitialNodes);
-
+	for (int i = 0; i < rhs.nodes; i++) {
+		if (!rhs.finalStates.check(i))
+		{
+			continue;
+		}
+		//finalStates.add();
+		finalStates.toggle(i + intitialNodes);
+	}
 	addState();
 	for (int i = 0; i < automata[startNode].getSize(); i++)
 		automata[nodes - 1].add(FiniteAutomata::Transition(automata[startNode][i].dest, automata[startNode][i].symbol));
 	for (int i = 0; i < rhs.automata[rhs.startNode].getSize(); i++)
 		automata[nodes - 1].add(FiniteAutomata::Transition(rhs.automata[rhs.startNode][i].dest + intitialNodes, rhs.automata[rhs.startNode][i].symbol));
 
-	if (finalStates.find(startNode) != -1 || rhs.finalStates.find(rhs.startNode) != -1)
-		finalStates.add(nodes-1);
+	if (finalStates.check(startNode)  || rhs.finalStates.check(rhs.startNode))
+		finalStates.toggle(nodes-1);
 
 	startNode = nodes - 1;
 	multiplStarts = false;
@@ -254,11 +287,15 @@ FiniteAutomata& FiniteAutomata::ConcatenationWith(const const FiniteAutomata& rh
 	int initialNodes = nodes;
 	combine(rhs);
 
-	for (int i = 0; i < finalStates.getSize(); i++)
+	for (int i = 0; i < nodes; i++)
 	{
+		if (!finalStates.check(i))
+		{
+			continue;
+		}
 		for (int j = 0; j < rhs.automata[rhs.startNode].getSize(); j++)
 		{
-			automata[finalStates[i]].add(
+			automata[i].add(
 				FiniteAutomata::Transition(
 					rhs.automata[rhs.startNode][j].dest + initialNodes
 					, rhs.automata[rhs.startNode][j].symbol)
@@ -267,11 +304,16 @@ FiniteAutomata& FiniteAutomata::ConcatenationWith(const const FiniteAutomata& rh
 
 	}
 
-	if (rhs.finalStates.find(rhs.startNode) == -1)
+	if (!rhs.finalStates.check(rhs.startNode))
 		finalStates.empty();
 
-	for (int i = 0; i < rhs.finalStates.getSize(); i++)
-		finalStates.add(rhs.finalStates[i] + initialNodes);
+	for (int i = 0; i < rhs.nodes; i++) {
+		if (!rhs.finalStates.check(i))
+		{
+			continue;
+		}
+		finalStates.toggle(i + initialNodes);
+	}
 	multiplStarts = false;
 
 	return *this;
@@ -279,12 +321,12 @@ FiniteAutomata& FiniteAutomata::ConcatenationWith(const const FiniteAutomata& rh
 FiniteAutomata& FiniteAutomata::Complement() {
 	makeDeterministic();
 	//makeTotal();
-	CustomCollection<int>newFinals;
+	BitSet newFinals(nodes);
 	for (int i = 0; i < nodes; i++)
 	{
-		if (finalStates.find(i)==-1)
+		if (!finalStates.check(i))
 		{
-			newFinals.add(i);
+			newFinals.toggle(i);
 		}
 	}
 	finalStates = std::move(newFinals);
@@ -324,7 +366,8 @@ FiniteAutomata FiniteAutomata::buildFromRegex(const RegularExpression& regEx) {
 	else
 	{
 		FiniteAutomata lhs = buildFromRegex(regEx.getLeft());
-		return lhs.KleeneStar();
+		lhs.KleeneStar();
+		return lhs;
 	}
 }
 CustomCollection<int> FiniteAutomata::getNodeStates(const CustomCollection<int>& nodes, char symbol)const {
@@ -375,7 +418,7 @@ int findInTableByNodeByStates(const CustomCollection<int>& currentStates, const 
 bool FiniteAutomata::haveFinal(const CustomCollection<int>& nodes)const {
 	for (int i = 0; i < nodes.getSize(); i++)
 	{
-		if (finalStates.find(nodes[i]) != -1)
+		if (finalStates.check(nodes[i]))
 		{
 			return true;
 		}
@@ -399,7 +442,7 @@ void FiniteAutomata::makeDeterministic() {
 	queue.push(0);
 	stateTable.add(StateTuple(std::move(newStart), 0));
 	newAutomaton.addState();
-	if (finalStates.find(startNode) != -1)
+	if (finalStates.check(startNode))
 	{
 		newAutomaton.makeFinal(0);
 	}
@@ -474,16 +517,20 @@ void FiniteAutomata::makeTotal() {
 RegularExpression FiniteAutomata::getRegEx()const {
 	RegularExpression result('\0');
 	bool isSet = false;
-	for (int i = 0; i < finalStates.getSize(); i++)
+	for (int i = 0; i < nodes; i++)
 	{
+		if (!finalStates.check(i))
+		{
+			continue;
+		}
 		if (!isSet)
 		{
-			result = generateRegEx(startNode, finalStates[i], nodes, true);
+			result = generateRegEx(startNode, i, nodes, true);
 			isSet = true;
 		}
 		else
 		{
-			result.UnionWith(generateRegEx(startNode, finalStates[i], nodes, true));
+			result.UnionWith(generateRegEx(startNode, i, nodes, true));
 		}
 	}
 	return result;
@@ -541,9 +588,9 @@ bool FiniteAutomata::accept(const MyString& word, int currentLetter, int node)co
 	{
 		if (currentLetter == 0)
 		{
-			return finalStates.find(startNode) != -1;
+			return finalStates.check(startNode);
 		}
-		return finalStates.find(node) != -1;
+		return finalStates.check(node);
 	}
 	if (node == -1)
 	{
@@ -586,20 +633,32 @@ FiniteAutomata FiniteAutomata::getReverse() const{
 	}
 	result.makeFinal(startNode);
 	result.addState();
-	if (finalStates.getSize()>1)
+	if (finalStates.getTruesCount()>1)
 	{
 		result.multiplStarts = true;
-		result.startStates = finalStates;
-	}
-	for (int i = 0; i < finalStates.getSize(); i++)
-	{
-		for (int j = 0; j < result.automata[finalStates[i]].getSize(); j++)
+		CustomCollection<int>newFinals(finalStates.getTruesCount());
+		for (int i = 0; i < nodes; i++)
 		{
-			result.addTransition(nodes, Transition(result.automata[finalStates[i]][j].dest, result.automata[finalStates[i]][j].symbol));
+			if (finalStates.check(i))
+			{
+				newFinals.add(i);
+			}
+		}
+		result.startStates =std::move(newFinals);
+	}
+	for (int i = 0; i < nodes; i++)
+	{
+		if (!finalStates.check(i))
+		{
+			continue;
+		}
+		for (int j = 0; j < result.automata[i].getSize(); j++)
+		{
+			result.addTransition(nodes, Transition(result.automata[i][j].dest, result.automata[i][j].symbol));
 		}
 	}
 	result.startNode = nodes;
-	if (finalStates.find(startNode)!=-1)
+	if (finalStates.check(startNode))
 	{
 		result.makeFinal(nodes);
 	}
@@ -632,7 +691,7 @@ bool FiniteAutomata::isEmptyLanguage()const {
 			if (visited[automata[current][i].dest])
 				continue;
 
-			if (finalStates.find(automata[current][i].dest)!=-1)
+			if (finalStates.check(automata[current][i].dest))
 			{
 				delete[] visited;
 				return false;

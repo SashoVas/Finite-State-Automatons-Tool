@@ -4,5 +4,7 @@
 #include "FiniteAutomata.h"
 int main()
 {
+	
 	Tests::runAllTests();
+
 }
