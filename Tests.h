@@ -25,6 +25,7 @@ public:
 	static bool runAutomatonMinimizationTests();
 	static bool runAutomatonReverseTests();
 	static bool isEmptyLanguageTests();
+	static bool runAutomatonGetRegExTests();
 
 	static bool runCollectionsTests();
 	static bool runBitSetCheckAndToggleTests();
@@ -366,6 +367,8 @@ bool Tests::runAutomatonFunctionsTests() {
 	runAutomatonMinimizationTests();
 	std::cout << "Is empty language tests:" << std::endl;
 	isEmptyLanguageTests();
+	std::cout << "Get RegEx tests:" << std::endl;
+	runAutomatonGetRegExTests();
 	return true;
 }
 bool Tests::runAutomatonTests() {
@@ -445,5 +448,34 @@ bool Tests::runBitSetAddAndResizeTests() {
 		}
 	}
 	std::cout << 1 << std::endl;
+	return true;
+}
+bool Tests::runAutomatonGetRegExTests() {
+	//Arange
+	FiniteAutomata automata("(a+b)*abcd+dc");
+	automata.minimize();
+	//Act
+	RegEx* regEx = automata.getRegEx();
+	FiniteAutomata result(regEx->getString());
+	//Assert
+
+	std::cout << result.accept("abcd") << std::endl;
+	std::cout << result.accept("aabcd") << std::endl;
+	std::cout << result.accept("babcd") << std::endl;
+	std::cout << result.accept("babababbbbaababcd") << std::endl;
+	std::cout << result.accept("aabababbbbaababcd") << std::endl;
+	std::cout << result.accept("dc") << std::endl;
+
+	std::cout << !result.accept("a") << std::endl;
+	std::cout << !result.accept("ab") << std::endl;
+	std::cout << !result.accept("abc") << std::endl;
+	std::cout << !result.accept("b") << std::endl;
+	std::cout << !result.accept("c") << std::endl;
+	std::cout << !result.accept("d") << std::endl;
+	std::cout << !result.accept("bcd") << std::endl;
+	std::cout << !result.accept("") << std::endl;
+	std::cout << !result.accept("ababababbbababc") << std::endl;
+	std::cout << !result.accept("ababababbbababd") << std::endl;
+	delete regEx;
 	return true;
 }
