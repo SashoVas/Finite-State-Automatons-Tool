@@ -1,7 +1,7 @@
 #pragma once
-#include "RegularExpression.h"
 #include "FiniteAutomata.h"
 #include "BitSet.h"
+#include "RegExParser.h"
 class Tests {
 public:
 	static bool runAllTests();
@@ -38,43 +38,43 @@ bool Tests::runRegularExpressionTests() {
 }
 bool Tests::runRegularExpressionGetRegExTests() {
 	
-	std::cout<< (RegularExpression("a(a+b)*b+b(a+b)*a").getRegEx() == "(a((a+b))*b+b((a+b))*a)") << std::endl;
-	std::cout<< (RegularExpression("a").getRegEx() == "a") << std::endl;
-	std::cout<< (RegularExpression("ab").getRegEx() == "ab") << std::endl;
-	std::cout<< (RegularExpression("ab+ac").getRegEx() == "(ab+ac)") << std::endl;
-	std::cout<< (RegularExpression("(ab+ac)*").getRegEx() == "((ab+ac))*") << std::endl;
-	std::cout<< (RegularExpression("(ab+ac)*+a").getRegEx() == "(((ab+ac))*+a)") << std::endl;
-	std::cout<< (RegularExpression("(ab+ac)*+a+b").getRegEx() == "(((ab+ac))*+(a+b))") << std::endl;
-	std::cout<< (RegularExpression("(ab+ac)*+a+ba").getRegEx() == "(((ab+ac))*+(a+ba))") << std::endl;
-	std::cout<< (RegularExpression("((ab+ac)*+a+ba)c").getRegEx() == "(((ab+ac))*+(a+ba))c") << std::endl;
-	std::cout<< (RegularExpression("((ab+ac)*+a+ba)c+d").getRegEx() == "((((ab+ac))*+(a+ba))c+d)") << std::endl;
-	std::cout<< (RegularExpression("((ab+ac)*+a+ba)c+d+b").getRegEx() == "((((ab+ac))*+(a+ba))c+(d+b))") << std::endl;
-	std::cout<< (RegularExpression("((ab+ac)*+a+ba)c+d+(b)*").getRegEx() == "((((ab+ac))*+(a+ba))c+(d+(b)*))") << std::endl;
-	std::cout<< (RegularExpression("(a)*").getRegEx() == "(a)*") << std::endl;
-	std::cout<< (RegularExpression("(a)*+(b)*").getRegEx() == "((a)*+(b)*)") << std::endl;
-	std::cout<< (RegularExpression("((a)*+(b)*)*").getRegEx() == "(((a)*+(b)*))*") << std::endl;
-	std::cout<< (RegularExpression("((ab)*+(bb)*)*").getRegEx() == "(((ab)*+(bb)*))*") << std::endl;
-	std::cout<< (RegularExpression("abcd").getRegEx() == "abcd") << std::endl;
-	std::cout<< (RegularExpression("(a)*(b)*").getRegEx() == "(a)*(b)*") << std::endl;
-	std::cout<< (RegularExpression("((a)*(b)*)*").getRegEx() == "((a)*(b)*)*") << std::endl;
-	std::cout<< (RegularExpression("(((a)*(b)*)*)*").getRegEx() == "(((a)*(b)*)*)*") << std::endl;
-	std::cout<< (RegularExpression("(((a)*(b)*)*)*+(((a)*(b)*)*)*").getRegEx() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*)") << std::endl;
-	std::cout<< (RegularExpression("((((a)*(b)*)*)*+(((a)*(b)*)*)*)c").getRegEx() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*)c") << std::endl;
-	std::cout<< (RegularExpression("(((a)*(b)*)*)*+(((a)*(b)*)*)*c").getRegEx() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
-	std::cout<< (RegularExpression("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)").getRegEx() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
-	std::cout<< (RegularExpression("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)").getRegEx() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
-	std::cout<< (RegularExpression("ab(a+c)*").getRegEx() == "ab((a+c))*") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("a(a+b)*b+b(a+b)*a")).getString() == "(a((a+b))*b+b((a+b))*a)") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("a")).getString() == "a") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("ab")).getString() == "ab") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("ab+ac")).getString() == "(ab+ac)") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("(ab+ac)*")).getString() == "((ab+ac))*") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("(ab+ac)*+a")).getString() == "(((ab+ac))*+a)") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("(ab+ac)*+a+b")).getString() == "(((ab+ac))*+(a+b))") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("(ab+ac)*+a+ba")).getString() == "(((ab+ac))*+(a+ba))") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("((ab+ac)*+a+ba)c")).getString() == "(((ab+ac))*+(a+ba))c") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("((ab+ac)*+a+ba)c+d")).getString() == "((((ab+ac))*+(a+ba))c+d)") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("((ab+ac)*+a+ba)c+d+b")).getString() == "((((ab+ac))*+(a+ba))c+(d+b))") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("((ab+ac)*+a+ba)c+d+(b)*")).getString() == "((((ab+ac))*+(a+ba))c+(d+(b)*))") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("(a)*")).getString() == "(a)*") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("(a)*+(b)*")).getString() == "((a)*+(b)*)") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("((a)*+(b)*)*")).getString() == "(((a)*+(b)*))*") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("((ab)*+(bb)*)*")).getString() == "(((ab)*+(bb)*))*") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("abcd")).getString() == "abcd") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("(a)*(b)*")).getString() == "(a)*(b)*") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("((a)*(b)*)*")).getString() == "((a)*(b)*)*") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("(((a)*(b)*)*)*")).getString() == "(((a)*(b)*)*)*") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("(((a)*(b)*)*)*+(((a)*(b)*)*)*")).getString() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*)") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("((((a)*(b)*)*)*+(((a)*(b)*)*)*)c")).getString() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*)c") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("(((a)*(b)*)*)*+(((a)*(b)*)*)*c")).getString() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)")).getString() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)")).getString() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
+	std::cout << ((*RegExParser::buildRegExFromString("ab(a+c)*")).getString() == "ab((a+c))*") << std::endl;
 
 	return true;
 }
 bool Tests::runAutomatonUnionTests() {
 	//Arange
-	RegularExpression firstRegEx("(a)*b(b)*");
-	RegularExpression secondRegEx("(c)*d");
-	FiniteAutomata firstAutomaton(firstRegEx);
-	FiniteAutomata secondAutomaton(secondRegEx);
+	//RegularExpression firstRegEx("(a)*b(b)*");
+	//RegularExpression secondRegEx("(c)*d");
+	FiniteAutomata firstAutomaton("(a)*b(b)*");
+	FiniteAutomata secondAutomaton("(c)*d");
 	//Act
-	FiniteAutomata result = Union(firstAutomaton,secondAutomaton);
+	FiniteAutomata result = FiniteAutomata::Union(firstAutomaton,secondAutomaton);
 	//Assert
 	std::cout << !(result.accept("a") )<< std::endl;
 	std::cout << !(result.accept("bbbbbbba")) << std::endl;
@@ -97,12 +97,12 @@ bool Tests::runAutomatonUnionTests() {
 }
 bool Tests::runAutomatonConcatenationTests() {
 	//Arange
-	RegularExpression firstRegEx("(a+b)*");
-	RegularExpression secondRegEx("(c+d)*");
-	FiniteAutomata firstAutomaton(firstRegEx);
-	FiniteAutomata secondAutomaton(secondRegEx);
+	//RegularExpression firstRegEx("(a+b)*");
+	//RegularExpression secondRegEx("(c+d)*");
+	FiniteAutomata firstAutomaton("(a+b)*");
+	FiniteAutomata secondAutomaton("(c+d)*");
 	//Act
-	FiniteAutomata result = Concatenation(firstAutomaton,secondAutomaton);
+	FiniteAutomata result = FiniteAutomata::Concatenation(firstAutomaton,secondAutomaton);
 	//Assert
 	std::cout << !result.accept("aabacabab")<<std::endl;
 	std::cout << !result.accept("adb")<<std::endl;
@@ -130,10 +130,10 @@ bool Tests::runAutomatonConcatenationTests() {
 }
 bool Tests::runAutomatonKleeneStarTests() {
 	//Arange
-	RegularExpression firstRegEx("a+b");
-	FiniteAutomata firstAutomaton(firstRegEx);
+	//RegularExpression firstRegEx("a+b");
+	FiniteAutomata firstAutomaton("a+b");
 	//Act
-	FiniteAutomata result = KleeneStar(firstAutomaton);
+	FiniteAutomata result = FiniteAutomata::KleeneStar(firstAutomaton);
 	//Assert
 	std::cout << result.accept("ab") << std::endl;
 	std::cout << result.accept("ba") << std::endl;
@@ -144,8 +144,8 @@ bool Tests::runAutomatonKleeneStarTests() {
 }
 bool Tests::runAutomatonComplementTests() {
 	//Arange
-	RegularExpression firstRegEx("(a+b)*(c+d)+ca");
-	FiniteAutomata result(firstRegEx);
+	//RegularExpression firstRegEx("(a+b)*(c+d)+ca");
+	FiniteAutomata result("(a+b)*(c+d)+ca");
 	//Act
 	result.Complement();
 	//Assert
@@ -173,12 +173,12 @@ bool Tests::runAutomatonComplementTests() {
 }
 bool Tests::runAutomatonIntersectionTests() {
 	//Arange
-	RegularExpression firstRegEx("((a)*bab(c)*)*");
-	RegularExpression secondRegEx("b(a)*bc(c)*");
-	FiniteAutomata firstAutomaton(firstRegEx);
-	FiniteAutomata secondAutomaton(secondRegEx);
+	//RegularExpression firstRegEx("((a)*bab(c)*)*");
+	//RegularExpression secondRegEx("b(a)*bc(c)*");
+	FiniteAutomata firstAutomaton("((a)*bab(c)*)*");
+	FiniteAutomata secondAutomaton("b(a)*bc(c)*");
 	//Act
-	FiniteAutomata result = Intersection(firstAutomaton, secondAutomaton);
+	FiniteAutomata result = FiniteAutomata::Intersection(firstAutomaton, secondAutomaton);
 	//Assert
 	std::cout << result.accept("babc") << std::endl;
 	std::cout << result.accept("babccc") << std::endl;
@@ -200,12 +200,12 @@ bool Tests::runAutomatonIntersectionTests() {
 }
 bool Tests::runAutomatonDifferenceTests() {
 	//Arange
-	RegularExpression firstRegEx("(a+b)*");
-	RegularExpression secondRegEx("((a+b)*aba(a+b)*)");
-	FiniteAutomata firstAutomaton(firstRegEx);
-	FiniteAutomata secondAutomaton(secondRegEx);
+	//RegularExpression firstRegEx("(a+b)*");
+	//RegularExpression secondRegEx("((a+b)*aba(a+b)*)");
+	FiniteAutomata firstAutomaton("(a+b)*");
+	FiniteAutomata secondAutomaton("((a+b)*aba(a+b)*)");
 	//Act
-	FiniteAutomata result = Difference(firstAutomaton, secondAutomaton);
+	FiniteAutomata result = FiniteAutomata::Difference(firstAutomaton, secondAutomaton);
 	//Assert
 	std::cout << result.accept("aaaaaabbaaabbaaabbaa") << std::endl;
 	std::cout << result.accept("bab") << std::endl;
@@ -231,8 +231,8 @@ bool Tests::runAutomatonDifferenceTests() {
 }
 bool Tests::runAutomatonTotalizationTests() {
 	//Arange
-	RegularExpression firstRegEx("(a+b)*cd");
-	FiniteAutomata result(firstRegEx);
+	//RegularExpression firstRegEx("(a+b)*cd");
+	FiniteAutomata result("(a+b)*cd");
 	//Act
 	result.makeTotal();
 	//Assert
@@ -256,8 +256,8 @@ bool Tests::runAutomatonTotalizationTests() {
 }
 bool Tests::runAutomatonDeterminizationTests() {
 	//Arange
-	RegularExpression firstRegEx("(a+b)*(c+d)*+ca");
-	FiniteAutomata result(firstRegEx);
+	//RegularExpression firstRegEx("(a+b)*(c+d)*+ca");
+	FiniteAutomata result("(a+b)*(c+d)*+ca");
 	//Act
 	result.makeDeterministic();
 	//Arrange
@@ -286,8 +286,8 @@ bool Tests::runAutomatonDeterminizationTests() {
 }
 bool Tests::runAutomatonReverseTests() {
 	//Arange
-	RegularExpression firstRegEx("(a+b)*(c+d)+ca");
-	FiniteAutomata result(firstRegEx); 
+	//RegularExpression firstRegEx("(a+b)*(c+d)+ca");
+	FiniteAutomata result("(a+b)*(c+d)+ca");
 	//Act
 	result.reverse();
 	//Assert
@@ -313,8 +313,8 @@ bool Tests::runAutomatonReverseTests() {
 }
 bool Tests::runAutomatonMinimizationTests() {
 	//Arange
-	RegularExpression firstRegEx("(a+b)*(c+d)*+ca");
-	FiniteAutomata result(firstRegEx);
+	//RegularExpression firstRegEx("(a+b)*(c+d)*+ca");
+	FiniteAutomata result("(a+b)*(c+d)*+ca");
 	//Act
 	result.minimize();
 	//Arrange
@@ -386,9 +386,9 @@ bool Tests::runAllTests() {
 }
 bool Tests::isEmptyLanguageTests() {
 	//Arange
-	RegularExpression firstRegEx("a+b");
-	FiniteAutomata firstAutomaton(firstRegEx);
-	FiniteAutomata secondAutomaton(firstRegEx);
+	//RegularExpression firstRegEx("a+b");
+	FiniteAutomata firstAutomaton("a+b");
+	FiniteAutomata secondAutomaton("a+b");
 	firstAutomaton.DifferenceWith(secondAutomaton);
 	//Act
 	bool result=firstAutomaton.isEmptyLanguage();
