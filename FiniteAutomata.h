@@ -4,9 +4,10 @@
 #include "BitSet.h"
 #include "MyString.h"
 #include "Transition.h"
+//#include "RegExHandler.h";
 //#include "RegEx.h"
 class RegEx;
-
+class RegExHandler;
 class FiniteAutomata {
 private:
 	int nodes = 0;
@@ -43,7 +44,7 @@ public:
 	void addTransition(int index, const Transition& transition);
 	void makeFinal(int index);
 
-	RegEx* getRegEx()const;
+	RegExHandler getRegEx()const;
 	FiniteAutomata getReverse()const;
 	bool isEmptyLanguage()const;
 

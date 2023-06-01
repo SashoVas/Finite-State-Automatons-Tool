@@ -8,8 +8,4 @@ public:
 	virtual MyString getString()const =0;
 	virtual ~RegEx() = default;
 	virtual FiniteAutomata getAutomaton()const = 0;
-
-	RegEx* getUnion(RegEx* right);
-	RegEx* getConcatenation(RegEx* right);
-	RegEx* getKleeneStar();
 };

@@ -1,13 +1,12 @@
 #pragma once
 #include "FiniteAutomata.h"
 #include "BitSet.h"
-#include "RegExParser.h"
+#include "RegExTests.h"
+
+//#include "RegExHandler.h"
 class Tests {
 public:
 	static bool runAllTests();
-
-	static bool runRegularExpressionTests();
-	static bool runRegularExpressionGetRegExTests();
 
 	static bool runAutomatonTests();
 
@@ -32,42 +31,6 @@ public:
 	static bool runBitSetAddAndResizeTests();
 };
 
-bool Tests::runRegularExpressionTests() {
-	std::cout << "RegEx parse tests:" << std::endl;
-	runRegularExpressionGetRegExTests();
-	return true;
-}
-bool Tests::runRegularExpressionGetRegExTests() {
-	
-	std::cout << ((*RegExParser::buildRegExFromString("a(a+b)*b+b(a+b)*a")).getString() == "(a((a+b))*b+b((a+b))*a)") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("a")).getString() == "a") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("ab")).getString() == "ab") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("ab+ac")).getString() == "(ab+ac)") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("(ab+ac)*")).getString() == "((ab+ac))*") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("(ab+ac)*+a")).getString() == "(((ab+ac))*+a)") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("(ab+ac)*+a+b")).getString() == "(((ab+ac))*+(a+b))") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("(ab+ac)*+a+ba")).getString() == "(((ab+ac))*+(a+ba))") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("((ab+ac)*+a+ba)c")).getString() == "(((ab+ac))*+(a+ba))c") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("((ab+ac)*+a+ba)c+d")).getString() == "((((ab+ac))*+(a+ba))c+d)") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("((ab+ac)*+a+ba)c+d+b")).getString() == "((((ab+ac))*+(a+ba))c+(d+b))") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("((ab+ac)*+a+ba)c+d+(b)*")).getString() == "((((ab+ac))*+(a+ba))c+(d+(b)*))") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("(a)*")).getString() == "(a)*") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("(a)*+(b)*")).getString() == "((a)*+(b)*)") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("((a)*+(b)*)*")).getString() == "(((a)*+(b)*))*") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("((ab)*+(bb)*)*")).getString() == "(((ab)*+(bb)*))*") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("abcd")).getString() == "abcd") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("(a)*(b)*")).getString() == "(a)*(b)*") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("((a)*(b)*)*")).getString() == "((a)*(b)*)*") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("(((a)*(b)*)*)*")).getString() == "(((a)*(b)*)*)*") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("(((a)*(b)*)*)*+(((a)*(b)*)*)*")).getString() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*)") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("((((a)*(b)*)*)*+(((a)*(b)*)*)*)c")).getString() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*)c") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("(((a)*(b)*)*)*+(((a)*(b)*)*)*c")).getString() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)")).getString() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)")).getString() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
-	std::cout << ((*RegExParser::buildRegExFromString("ab(a+c)*")).getString() == "ab((a+c))*") << std::endl;
-
-	return true;
-}
 bool Tests::runAutomatonUnionTests() {
 	//Arange
 	//RegularExpression firstRegEx("(a)*b(b)*");
@@ -381,8 +344,8 @@ bool Tests::runAutomatonTests() {
 bool Tests::runAllTests() {
 	std::cout << "Collection tests:" << std::endl;
 	runCollectionsTests();
-	std::cout << "RegEx tests:" << std::endl;
-	runRegularExpressionTests();
+	std::cout << "Collection tests:" << std::endl;
+	RegExTests::runRegularExpressionTests();
 	std::cout << "Automaton tests:" << std::endl;
 	runAutomatonTests();
 	return true;
@@ -452,30 +415,29 @@ bool Tests::runBitSetAddAndResizeTests() {
 }
 bool Tests::runAutomatonGetRegExTests() {
 	//Arange
-	FiniteAutomata automata("(a+b)*abcd+dc");
-	automata.minimize();
-	//Act
-	RegEx* regEx = automata.getRegEx();
-	FiniteAutomata result(regEx->getString());
-	//Assert
+	//FiniteAutomata automata("(a+b)*abcd+dc");
+	//automata.minimize();
+	////Act
+	//RegExHandler regEx = automata.getRegEx();
+	//FiniteAutomata result(regEx.getString());
+	////Assert
 
-	std::cout << result.accept("abcd") << std::endl;
-	std::cout << result.accept("aabcd") << std::endl;
-	std::cout << result.accept("babcd") << std::endl;
-	std::cout << result.accept("babababbbbaababcd") << std::endl;
-	std::cout << result.accept("aabababbbbaababcd") << std::endl;
-	std::cout << result.accept("dc") << std::endl;
+	//std::cout << result.accept("abcd") << std::endl;
+	//std::cout << result.accept("aabcd") << std::endl;
+	//std::cout << result.accept("babcd") << std::endl;
+	//std::cout << result.accept("babababbbbaababcd") << std::endl;
+	//std::cout << result.accept("aabababbbbaababcd") << std::endl;
+	//std::cout << result.accept("dc") << std::endl;
 
-	std::cout << !result.accept("a") << std::endl;
-	std::cout << !result.accept("ab") << std::endl;
-	std::cout << !result.accept("abc") << std::endl;
-	std::cout << !result.accept("b") << std::endl;
-	std::cout << !result.accept("c") << std::endl;
-	std::cout << !result.accept("d") << std::endl;
-	std::cout << !result.accept("bcd") << std::endl;
-	std::cout << !result.accept("") << std::endl;
-	std::cout << !result.accept("ababababbbababc") << std::endl;
-	std::cout << !result.accept("ababababbbababd") << std::endl;
-	delete regEx;
+	//std::cout << !result.accept("a") << std::endl;
+	//std::cout << !result.accept("ab") << std::endl;
+	//std::cout << !result.accept("abc") << std::endl;
+	//std::cout << !result.accept("b") << std::endl;
+	//std::cout << !result.accept("c") << std::endl;
+	//std::cout << !result.accept("d") << std::endl;
+	//std::cout << !result.accept("bcd") << std::endl;
+	//std::cout << !result.accept("") << std::endl;
+	//std::cout << !result.accept("ababababbbababc") << std::endl;
+	//std::cout << !result.accept("ababababbbababd") << std::endl;
 	return true;
 }

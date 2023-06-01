@@ -1,12 +1,6 @@
 #include "FiniteAutomata.h"
-#include "Concatenation.h"
-#include "Union.h"
-#include "KleeneStar.h"
-#include "Symbol.h"
-#include "SharedPointer.h"
-#include "RegExParser.h"
 #include "MyQueue.hpp"
-
+#include"RegExHandler.h"
 FiniteAutomata::FiniteAutomata(int size) :automata(size), finalStates(size) {
 	startNode = 0;
 	nodes = size;
@@ -28,7 +22,8 @@ FiniteAutomata::FiniteAutomata(char symbol) {
 	alphabet.add(symbol);
 }
 FiniteAutomata::FiniteAutomata(const MyString& regEx) {
-	FiniteAutomata toReplace = (*RegExParser::buildRegExFromString(regEx)).getAutomaton();
+	//FiniteAutomata toReplace = (*RegExParser::buildRegExFromString(regEx)).getAutomaton();
+	FiniteAutomata toReplace = RegExHandler(regEx).getAutomata();
 	*this = std::move(toReplace);
 }
 void FiniteAutomata::addToAlphabet(char symbol) {
@@ -418,19 +413,24 @@ RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
 			{
 				if (!isSet)
 				{
-					result = new Symbol(alphabet[symbol]);
+					//result = new Symbol(alphabet[symbol]);
+					result = RegExHandler::makeSymbol(alphabet[symbol]);
 					isSet = true;
 				}
 				else
-					result = result->getUnion(new Symbol(alphabet[symbol]));
+					//result = result->getUnion(new Symbol(alphabet[symbol]));
+					result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol(alphabet[symbol]));
+					//result = new UnionRegEx(result,new Symbol(alphabet[symbol]));
 			}
 		}
 		if (i == j && epsilon)
 		{
 			if (isSet&&!result->isEpsilon())
-				result = result->getUnion(new Symbol('$'));
+				//result = result->getUnion(new Symbol('$'));
+				//result = new UnionRegEx(result, new Symbol('$'));
+				result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol('$'));
 			else if(!isSet)
-				result=new Symbol('$');
+				result= RegExHandler::makeSymbol('$');
 		}
 		return result;
 	}
@@ -445,7 +445,18 @@ RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
 		delete end;
 		return lhs;
 	}
-	middle = middle->getKleeneStar();
+	if (middle==nullptr)
+	{
+		//middle = new Symbol('$');
+		middle = RegExHandler::makeSymbol('$');
+	}
+	else
+	{
+		//middle = middle->getKleeneStar();
+		//middle = new KleeneStarRegEx(middle);
+		middle = RegExHandler::makeKleeneStar(middle);
+	}
+
 
 	//with middle
 	if (rhs->isEpsilon())
@@ -456,8 +467,10 @@ RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
 	}
 	else if (middle->isEpsilon())
 		delete middle;
-	else 
-		rhs= rhs->getConcatenation(middle);
+	else
+		//rhs = new ConcatenationRegEx(rhs,middle);
+		rhs = RegExHandler::makeConcatenation(rhs,middle);
+		//rhs= rhs->getConcatenation(middle);
 	
 	//with end
 	if (rhs->isEpsilon())
@@ -469,8 +482,9 @@ RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
 	else if (end->isEpsilon())
 		delete end;
 	else
-		rhs = rhs->getConcatenation(end);	
-
+		//rhs = rhs->getConcatenation(end);	
+		//rhs = new ConcatenationRegEx(rhs,end);
+		rhs =RegExHandler::makeConcatenation(rhs,end);
 	if (lhs==nullptr)
 		return rhs;
 	if (lhs->getString()==rhs->getString())
@@ -478,10 +492,12 @@ RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
 		delete rhs;
 		return lhs;
 	}
-	lhs= lhs->getUnion(rhs);
+	//lhs= lhs->getUnion(rhs);
+	//lhs = new UnionRegEx(lhs,rhs);
+	lhs = RegExHandler::makeUnion(lhs,rhs);
 	return lhs;
 }
-RegEx* FiniteAutomata::getRegEx()const {
+RegExHandler FiniteAutomata::getRegEx()const {
 	RegEx* result=nullptr;
 	bool isSet = false;
 	for (int i = 0; i < nodes; i++)
@@ -497,10 +513,12 @@ RegEx* FiniteAutomata::getRegEx()const {
 		}
 		else
 		{
-			result=result->getUnion(generateRegEx(startNode, i, nodes, true));
+			//result=result->getUnion(generateRegEx(startNode, i, nodes, true));
+			//result = new UnionRegEx(result,generateRegEx(startNode, i, nodes, true));
+			result = RegExHandler::makeUnion(result,generateRegEx(startNode, i, nodes, true));
 		}
 	}
-	return result;
+	return RegExHandler( result);
 }
 
 bool FiniteAutomata::accept(const MyString& word, int currentLetter, int node)const {
