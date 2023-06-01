@@ -3,7 +3,6 @@
 #include "RegExTests.h"
 #include "FiniteAutomata.h"
 #include "RegEx.h"
-#include "RegExParser.h"
 int main()
 {
 	
