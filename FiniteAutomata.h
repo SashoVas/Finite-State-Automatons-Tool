@@ -4,6 +4,7 @@
 #include "BitSet.h"
 #include "MyString.h"
 #include "Transition.h"
+
 //#include "RegExHandler.h";
 //#include "RegEx.h"
 class RegEx;
@@ -35,6 +36,7 @@ public:
 	FiniteAutomata(char symbol);
 	//
 	FiniteAutomata(const MyString& regEx);
+	FiniteAutomata(const RegExHandler& regEx);
 	//
 	void writeToFile()const;
 	void readFromFile();

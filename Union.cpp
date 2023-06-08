@@ -27,24 +27,26 @@ UnionRegEx::UnionRegEx(RegEx* left, RegEx* right) {
 	this->right = right;
 }
 
-UnionRegEx::UnionRegEx(const UnionRegEx& other) {
+UnionRegEx::UnionRegEx(const UnionRegEx& other):RegEx(other) {
 	copyFrom(other);
 }
 UnionRegEx& UnionRegEx::operator=(const UnionRegEx& other) {
 	if (this != &other)
 	{
+		RegEx::operator=(other);
 		free();
 		copyFrom(other);
 	}
 	return *this;
 }
 
-UnionRegEx::UnionRegEx(UnionRegEx&& other) {
+UnionRegEx::UnionRegEx(UnionRegEx&& other):RegEx(std::move(other)) {
 	moveFrom(std::move(other));
 }
 UnionRegEx& UnionRegEx::operator=(UnionRegEx&& other) {
 	if (this != &other)
 	{
+		RegEx::operator=(std::move(other));
 		free();
 		moveFrom(std::move(other));
 	}

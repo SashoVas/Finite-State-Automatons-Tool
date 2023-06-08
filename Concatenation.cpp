@@ -3,6 +3,7 @@
 ConcatenationRegEx& ConcatenationRegEx::operator=(const ConcatenationRegEx& other) {
 	if (this != &other)
 	{
+		RegEx::operator=(other);
 		free();
 		copyFrom(other);
 	}
@@ -34,16 +35,17 @@ ConcatenationRegEx::ConcatenationRegEx(RegEx* left, RegEx* right) {
 	this->left = left;
 	this->right = right;
 }
-ConcatenationRegEx::ConcatenationRegEx(const ConcatenationRegEx& other) {
+ConcatenationRegEx::ConcatenationRegEx(const ConcatenationRegEx& other):RegEx(other) {
 	copyFrom(other);
 }
 
-ConcatenationRegEx::ConcatenationRegEx(ConcatenationRegEx&& other) {
+ConcatenationRegEx::ConcatenationRegEx(ConcatenationRegEx&& other):RegEx(std::move(other)) {
 	moveFrom(std::move(other));
 }
 ConcatenationRegEx& ConcatenationRegEx::operator=(ConcatenationRegEx&& other) {
 	if (this != &other)
 	{
+		RegEx::operator=(std::move(other));
 		free();
 		moveFrom(std::move(other));
 	}

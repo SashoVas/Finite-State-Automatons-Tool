@@ -26,6 +26,10 @@ FiniteAutomata::FiniteAutomata(const MyString& regEx) {
 	FiniteAutomata toReplace = RegExHandler(regEx).getAutomata();
 	*this = std::move(toReplace);
 }
+FiniteAutomata::FiniteAutomata(const RegExHandler& regEx) {
+	*this = std::move(regEx.getAutomata());
+}
+
 void FiniteAutomata::addToAlphabet(char symbol) {
 	if (alphabet.find(symbol) != -1)
 		return;

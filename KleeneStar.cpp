@@ -29,25 +29,27 @@ KleeneStarRegEx::KleeneStarRegEx(RegEx* element) {
 	}
 
 }
-KleeneStarRegEx::KleeneStarRegEx(const KleeneStarRegEx& other) {
+KleeneStarRegEx::KleeneStarRegEx(const KleeneStarRegEx& other) :RegEx(other) {
 	copyFrom(other);
 }
 
 KleeneStarRegEx& KleeneStarRegEx::operator=(const KleeneStarRegEx& other) {
 	if (this != &other)
 	{
+		RegEx::operator=(other);
 		free();
 		copyFrom(other);
 	}
 	return *this;
 }
 
-KleeneStarRegEx::KleeneStarRegEx(KleeneStarRegEx&& other) {
+KleeneStarRegEx::KleeneStarRegEx(KleeneStarRegEx&& other) :RegEx(std::move(other)) {
 	moveFrom(std::move(other));
 }
 KleeneStarRegEx& KleeneStarRegEx::operator=(KleeneStarRegEx&& other) {
 	if (this != &other)
 	{
+		RegEx::operator=(std::move(other));
 		free();
 		moveFrom(std::move(other));
 	}

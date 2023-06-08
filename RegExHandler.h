@@ -14,16 +14,20 @@ public:
 	RegExHandler(const RegExHandler& other);
 	RegExHandler(RegExHandler&& other);
 
-	static RegEx* buildRegExFromString(const MyString& str);
+	static RegEx* buildRegExFromString(const MyString& str) ;
 	static RegEx* getRegExFromString(const MyString& str, int& currentPosition);
 	static RegEx* makeUnion(RegEx* left, RegEx* right);
 	static RegEx* makeConcatenation(RegEx* left, RegEx* right);
 	static RegEx* makeKleeneStar(RegEx* left);
 	static RegEx* makeSymbol(char symbol);
 
+	//void UnionWith();
+	//void ConcatenateWith();
+	//void KleeneStar();
+
 	RegExHandler& operator=(const RegExHandler& other);
 	RegExHandler& operator=(RegExHandler&& other);
 
-	MyString getString();
-	FiniteAutomata getAutomata();
+	MyString getString() const;
+	FiniteAutomata getAutomata() const;
 };

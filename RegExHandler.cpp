@@ -123,9 +123,9 @@ RegEx* RegExHandler::makeKleeneStar(RegEx* left) {
 RegEx* RegExHandler::makeSymbol(char symbol) {
 	return new Symbol(symbol);
 }
-MyString RegExHandler::getString() {
+MyString RegExHandler::getString() const {
 	return ptr->getString();
 }
-FiniteAutomata RegExHandler::getAutomata() {
+FiniteAutomata RegExHandler::getAutomata() const {
 	return ptr->getAutomaton();
 }
