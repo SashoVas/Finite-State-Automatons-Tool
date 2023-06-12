@@ -21,9 +21,12 @@ public:
 	static RegEx* makeKleeneStar(RegEx* left);
 	static RegEx* makeSymbol(char symbol);
 
-	//void UnionWith();
-	//void ConcatenateWith();
-	//void KleeneStar();
+	void UnionWith(const RegExHandler& other);
+	void ConcatenateWith(const RegExHandler& other);
+
+	void UnionWith(RegExHandler&& other);
+	void ConcatenateWith(RegExHandler&& other);
+	void KleeneStar();
 
 	RegExHandler& operator=(const RegExHandler& other);
 	RegExHandler& operator=(RegExHandler&& other);

@@ -417,21 +417,16 @@ RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
 			{
 				if (!isSet)
 				{
-					//result = new Symbol(alphabet[symbol]);
 					result = RegExHandler::makeSymbol(alphabet[symbol]);
 					isSet = true;
 				}
 				else
-					//result = result->getUnion(new Symbol(alphabet[symbol]));
 					result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol(alphabet[symbol]));
-					//result = new UnionRegEx(result,new Symbol(alphabet[symbol]));
 			}
 		}
 		if (i == j && epsilon)
 		{
 			if (isSet&&!result->isEpsilon())
-				//result = result->getUnion(new Symbol('$'));
-				//result = new UnionRegEx(result, new Symbol('$'));
 				result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol('$'));
 			else if(!isSet)
 				result= RegExHandler::makeSymbol('$');
@@ -450,17 +445,9 @@ RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
 		return lhs;
 	}
 	if (middle==nullptr)
-	{
-		//middle = new Symbol('$');
 		middle = RegExHandler::makeSymbol('$');
-	}
 	else
-	{
-		//middle = middle->getKleeneStar();
-		//middle = new KleeneStarRegEx(middle);
 		middle = RegExHandler::makeKleeneStar(middle);
-	}
-
 
 	//with middle
 	if (rhs->isEpsilon())
@@ -472,9 +459,7 @@ RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
 	else if (middle->isEpsilon())
 		delete middle;
 	else
-		//rhs = new ConcatenationRegEx(rhs,middle);
 		rhs = RegExHandler::makeConcatenation(rhs,middle);
-		//rhs= rhs->getConcatenation(middle);
 	
 	//with end
 	if (rhs->isEpsilon())
@@ -486,8 +471,6 @@ RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
 	else if (end->isEpsilon())
 		delete end;
 	else
-		//rhs = rhs->getConcatenation(end);	
-		//rhs = new ConcatenationRegEx(rhs,end);
 		rhs =RegExHandler::makeConcatenation(rhs,end);
 	if (lhs==nullptr)
 		return rhs;
@@ -496,8 +479,6 @@ RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
 		delete rhs;
 		return lhs;
 	}
-	//lhs= lhs->getUnion(rhs);
-	//lhs = new UnionRegEx(lhs,rhs);
 	lhs = RegExHandler::makeUnion(lhs,rhs);
 	return lhs;
 }

@@ -13,6 +13,8 @@ class BitSet {
 	int getBucketPositionMask(int index)const;
 	void resize(int newCapacity);
 public:
+	friend class AutomatonFileHandler;
+
 	BitSet();
 	BitSet(int size);
 	~BitSet();
@@ -27,4 +29,6 @@ public:
 	void empty();
 
 	int getTruesCount()const;
+	int getSize()const;
+	const char* getRaw()const;
 };

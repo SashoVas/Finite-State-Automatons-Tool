@@ -3,6 +3,13 @@
 int BitSet::getTruesCount()const {
 	return truesCount;
 }
+int BitSet::getSize()const {
+	return size;
+}
+const char* BitSet::getRaw()const {
+	return data;
+}
+
 int BitSet::getBucketsCount()const {
 	return (capacity + 1) / 8 + 1;
 }

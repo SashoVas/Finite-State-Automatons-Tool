@@ -129,3 +129,22 @@ MyString RegExHandler::getString() const {
 FiniteAutomata RegExHandler::getAutomata() const {
 	return ptr->getAutomaton();
 }
+
+void RegExHandler::UnionWith(const RegExHandler& other) {
+	ptr = new UnionRegEx(ptr,other.ptr->clone());
+}
+void RegExHandler::ConcatenateWith(const RegExHandler& other) {
+	ptr = new ConcatenationRegEx(ptr, other.ptr->clone());
+}
+
+void RegExHandler::UnionWith(RegExHandler&& other) {
+	ptr = new UnionRegEx(ptr, other.ptr);
+	other.ptr = nullptr;
+}
+void RegExHandler::ConcatenateWith(RegExHandler&& other) {
+	ptr = new ConcatenationRegEx(ptr, other.ptr);
+	other.ptr = nullptr;
+}
+void RegExHandler::KleeneStar() {
+	ptr = new KleeneStarRegEx(ptr);
+}

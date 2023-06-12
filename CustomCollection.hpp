@@ -11,6 +11,8 @@ class CustomCollection {
 
 	void resize(int capacity);
 public:
+	friend class AutomatonFileHandler;
+
 	CustomCollection();
 	CustomCollection(const CustomCollection& other);
 	CustomCollection(int capacity);
@@ -27,8 +29,10 @@ public:
 
 	int getSize()const;
 	int find(const T& other)const;
+	const T* getRaw()const;
 
 	void add(const T& element);
+	void add(T&& element);
 	void remove();
 	void empty();
 };
@@ -141,6 +145,15 @@ void CustomCollection<T>::add(const T& element) {
 }
 
 template <class T>
+void CustomCollection<T>::add(T&& element) {
+	if (size >= capacity)
+	{
+		resize(capacity * 2);
+	}
+	elements[size++] = std::move(element);
+}
+
+template <class T>
 void CustomCollection<T>::remove() {
 	size--;
 	if (size*4<capacity)
@@ -158,6 +171,10 @@ void CustomCollection<T>::empty() {
 template <class T>
 int CustomCollection<T>::getSize()const {
 	return size;
+}
+template <class T>
+const T* CustomCollection<T>::getRaw()const {
+	return elements;
 }
 
 template <class T>

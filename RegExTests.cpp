@@ -33,7 +33,7 @@ bool RegExTests::runRegularExpressionGetRegExTests() {
 	std::cout << ((RegExHandler("(((a)*(b)*)*)*+(((a)*(b)*)*)*c")).getString() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
 	std::cout << ((RegExHandler("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)")).getString() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
 	std::cout << ((RegExHandler("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)")).getString() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
-	std::cout << ((*RegExHandler::buildRegExFromString("ab(a+c)*")).getString() == "ab((a+c))*") << std::endl;
+	std::cout << ((RegExHandler("ab(a+c)*")).getString() == "ab((a+c))*") << std::endl;
 
 	return true;
 }

@@ -30,7 +30,7 @@ private:
 	bool haveFinal(const CustomCollection<int>& nodes)const;
 	//
 public:
-
+	friend class AutomatonFileHandler;
 	FiniteAutomata(int size);
 	FiniteAutomata() = default;
 	FiniteAutomata(char symbol);
@@ -38,8 +38,6 @@ public:
 	FiniteAutomata(const MyString& regEx);
 	FiniteAutomata(const RegExHandler& regEx);
 	//
-	void writeToFile()const;
-	void readFromFile();
 
 	void addState();
 	void changeStart(int index);
