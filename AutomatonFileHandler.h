@@ -3,8 +3,8 @@
 #include <fstream>
 class AutomatonFileHandler {
 public:
-	FiniteAutomata readFromFile(const char* fileName);
-	void writeToFile(const char* fileName,const FiniteAutomata& automaton);
+	static FiniteAutomata readFromFile(const char* fileName);
+	static void writeToFile(const char* fileName,const FiniteAutomata& automaton);
 };
 void AutomatonFileHandler::writeToFile(const char* fileName, const FiniteAutomata& automaton) {
 	std::ofstream output(fileName,std::ios::out|std::ios::binary);
