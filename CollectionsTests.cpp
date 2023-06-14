@@ -4,10 +4,10 @@
 bool CollectionsTests::runCollectionsTests() {
 	std::cout << "BitSet tests:" << std::endl;
 	std::cout << "BitSet toggle and check Tests:" << std::endl;
-	runBitSetCheckAndToggleTests();
+	bool checkTests = runBitSetCheckAndToggleTests();
 	std::cout << "BitSet add and resize Tests:" << std::endl;
-	runBitSetAddAndResizeTests();
-	return true;
+	bool resizeTests = runBitSetAddAndResizeTests();
+	return checkTests && resizeTests;
 }
 bool CollectionsTests::runBitSetCheckAndToggleTests()
 {

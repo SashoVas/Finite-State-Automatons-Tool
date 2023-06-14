@@ -1,6 +1,18 @@
 #include"AutomatonTests.h"
-#include "FiniteAutomata.h"
 #include "RegExHandler.h"
+
+bool AutomatonTests::assertWordAccepted(const MyString& word, const FiniteAutomata& automata) {
+	bool result = automata.accept(word);
+	std::cout << result << std::endl;
+	return result;
+}
+bool AutomatonTests::assertWordRejected(const MyString& word, const FiniteAutomata& automata) {
+	bool result = automata.accept(word);
+	std::cout << !result << std::endl;
+	return !result;
+}
+
+
 bool AutomatonTests::runAutomatonUnionTests() {
 	//Arange
 	//RegularExpression firstRegEx("(a)*b(b)*");
@@ -10,24 +22,28 @@ bool AutomatonTests::runAutomatonUnionTests() {
 	//Act
 	FiniteAutomata result = FiniteAutomata::Union(firstAutomaton, secondAutomaton);
 	//Assert
-	std::cout << !(result.accept("a")) << std::endl;
-	std::cout << !(result.accept("bbbbbbba")) << std::endl;
-	std::cout << !(result.accept("dddddddd")) << std::endl;
-	std::cout << !(result.accept("ac")) << std::endl;
-	std::cout << !(result.accept("ad")) << std::endl;
-	std::cout << !(result.accept("ca")) << std::endl;
-	std::cout << !(result.accept("cb")) << std::endl;
-	std::cout << !result.accept("ccccccc") << std::endl;
-	std::cout << !result.accept("") << std::endl;
+	bool isValid = true;
 
-	std::cout << result.accept("ab") << std::endl;
-	std::cout << result.accept("b") << std::endl;
-	std::cout << result.accept("aaaaab") << std::endl;
-	std::cout << result.accept("aaaaabbbbbbb") << std::endl;
-	std::cout << result.accept("cd") << std::endl;
-	std::cout << result.accept("d") << std::endl;
-	std::cout << result.accept("cccccccd") << std::endl;
-	return true;
+	isValid = isValid && assertWordRejected("a", result);
+	isValid = isValid && assertWordRejected("a", result);
+	isValid = isValid && assertWordRejected("bbbbbbba", result);
+	isValid = isValid && assertWordRejected("dddddddd", result);
+	isValid = isValid && assertWordRejected("ac", result);
+	isValid = isValid && assertWordRejected("ad", result);
+	isValid = isValid && assertWordRejected("ca", result);
+	isValid = isValid && assertWordRejected("cb", result);
+	isValid = isValid && assertWordRejected("ccccccc", result);
+	isValid = isValid && assertWordRejected("", result);
+
+
+	isValid = isValid && assertWordAccepted("ab", result);
+	isValid = isValid && assertWordAccepted("b", result);
+	isValid = isValid && assertWordAccepted("aaaaab", result);
+	isValid = isValid && assertWordAccepted("aaaaabbbbbbb", result);
+	isValid = isValid && assertWordAccepted("cd", result);
+	isValid = isValid && assertWordAccepted("d", result);
+	isValid = isValid && assertWordAccepted("cccccccd", result);
+	return isValid;
 }
 bool AutomatonTests::runAutomatonConcatenationTests() {
 	//Arange
@@ -38,29 +54,30 @@ bool AutomatonTests::runAutomatonConcatenationTests() {
 	//Act
 	FiniteAutomata result = FiniteAutomata::Concatenation(firstAutomaton, secondAutomaton);
 	//Assert
-	std::cout << !result.accept("aabacabab") << std::endl;
-	std::cout << !result.accept("adb") << std::endl;
-	std::cout << !result.accept("acb") << std::endl;
-	std::cout << !result.accept("db") << std::endl;
-	std::cout << !result.accept("cb") << std::endl;
-	std::cout << !result.accept("ca") << std::endl;
-	std::cout << !result.accept("da") << std::endl;
+	bool isValid = true;
+	isValid = isValid && assertWordRejected("aabacabab", result);
+	isValid = isValid && assertWordRejected("adb", result);
+	isValid = isValid && assertWordRejected("acb", result);
+	isValid = isValid && assertWordRejected("db", result);
+	isValid = isValid && assertWordRejected("cb", result);
+	isValid = isValid && assertWordRejected("ca", result);
+	isValid = isValid && assertWordRejected("da", result);
 
-	std::cout << result.accept("abaabaabacdddcccd") << std::endl;
-	std::cout << result.accept("a") << std::endl;
-	std::cout << result.accept("ab") << std::endl;
-	std::cout << result.accept("ac") << std::endl;
-	std::cout << result.accept("ad") << std::endl;
-	std::cout << result.accept("b") << std::endl;
-	std::cout << result.accept("ba") << std::endl;
-	std::cout << result.accept("bc") << std::endl;
-	std::cout << result.accept("bd") << std::endl;
-	std::cout << result.accept("c") << std::endl;
-	std::cout << result.accept("cd") << std::endl;
-	std::cout << result.accept("d") << std::endl;
-	std::cout << result.accept("dc") << std::endl;
-	std::cout << result.accept("") << std::endl;
-	return true;
+	isValid = isValid && assertWordAccepted("abaabaabacdddcccd", result);
+	isValid = isValid && assertWordAccepted("a", result);
+	isValid = isValid && assertWordAccepted("ab", result);
+	isValid = isValid && assertWordAccepted("ac", result);
+	isValid = isValid && assertWordAccepted("ad", result);
+	isValid = isValid && assertWordAccepted("b", result);
+	isValid = isValid && assertWordAccepted("ba", result);
+	isValid = isValid && assertWordAccepted("bc", result);
+	isValid = isValid && assertWordAccepted("bd", result);
+	isValid = isValid && assertWordAccepted("c", result);
+	isValid = isValid && assertWordAccepted("cd", result);
+	isValid = isValid && assertWordAccepted("d", result);
+	isValid = isValid && assertWordAccepted("dc", result);
+	isValid = isValid && assertWordAccepted("", result);
+	return isValid;
 }
 bool AutomatonTests::runAutomatonKleeneStarTests() {
 	//Arange
@@ -69,12 +86,13 @@ bool AutomatonTests::runAutomatonKleeneStarTests() {
 	//Act
 	FiniteAutomata result = FiniteAutomata::KleeneStar(firstAutomaton);
 	//Assert
-	std::cout << result.accept("ab") << std::endl;
-	std::cout << result.accept("ba") << std::endl;
-	std::cout << result.accept("bababaabbaaabbba") << std::endl;
-	std::cout << result.accept("abaaabbbbaaba") << std::endl;
-	std::cout << result.accept("") << std::endl;
-	return true;
+	bool isValid = true;
+	isValid = isValid && assertWordAccepted("ab", result);
+	isValid = isValid && assertWordAccepted("ba", result);
+	isValid = isValid && assertWordAccepted("bababaabbaaabbba", result);
+	isValid = isValid && assertWordAccepted("abaaabbbbaaba", result);
+	isValid = isValid && assertWordAccepted("", result);
+	return isValid;
 }
 bool AutomatonTests::runAutomatonComplementTests() {
 	//Arange
@@ -83,27 +101,28 @@ bool AutomatonTests::runAutomatonComplementTests() {
 	//Act
 	result.Complement();
 	//Assert
-	std::cout << result.accept("a") << std::endl;
-	std::cout << result.accept("b") << std::endl;
-	std::cout << result.accept("ab") << std::endl;
-	std::cout << result.accept("ccc") << std::endl;
-	std::cout << result.accept("ddd") << std::endl;
-	std::cout << result.accept("acac") << std::endl;
-	std::cout << result.accept("abab") << std::endl;
-	std::cout << result.accept("adad") << std::endl;
-	std::cout << result.accept("bdbd") << std::endl;
-	std::cout << result.accept("baba") << std::endl;
-	std::cout << result.accept("bcbc") << std::endl;
-	std::cout << result.accept("") << std::endl;
+	bool isValid = true;
+	isValid = isValid && assertWordAccepted("a", result);
+	isValid = isValid && assertWordAccepted("b", result);
+	isValid = isValid && assertWordAccepted("ab", result);
+	isValid = isValid && assertWordAccepted("ccc", result);
+	isValid = isValid && assertWordAccepted("ddd", result);
+	isValid = isValid && assertWordAccepted("acac", result);
+	isValid = isValid && assertWordAccepted("abab", result);
+	isValid = isValid && assertWordAccepted("adad", result);
+	isValid = isValid && assertWordAccepted("bdbd", result);
+	isValid = isValid && assertWordAccepted("baba", result);
+	isValid = isValid && assertWordAccepted("bcbc", result);
+	isValid = isValid && assertWordAccepted("", result);
 
-	std::cout << !result.accept("abc") << std::endl;
-	std::cout << !result.accept("ac") << std::endl;
-	std::cout << !result.accept("ad") << std::endl;
-	std::cout << !result.accept("bd") << std::endl;
-	std::cout << !result.accept("bc") << std::endl;
-	std::cout << !result.accept("ca") << std::endl;
+	isValid = isValid && assertWordRejected("abc", result);
+	isValid = isValid && assertWordRejected("ac", result);
+	isValid = isValid && assertWordRejected("ad", result);
+	isValid = isValid && assertWordRejected("bd", result);
+	isValid = isValid && assertWordRejected("bc", result);
+	isValid = isValid && assertWordRejected("ca", result);
 
-	return true;
+	return isValid;
 }
 bool AutomatonTests::runAutomatonIntersectionTests() {
 	//Arange
@@ -114,23 +133,24 @@ bool AutomatonTests::runAutomatonIntersectionTests() {
 	//Act
 	FiniteAutomata result = FiniteAutomata::Intersection(firstAutomaton, secondAutomaton);
 	//Assert
-	std::cout << result.accept("babc") << std::endl;
-	std::cout << result.accept("babccc") << std::endl;
+	bool isValid = true;
+	isValid = isValid && assertWordAccepted("babc", result);;
+	isValid = isValid && assertWordAccepted("babccc", result);
 
-	std::cout << !result.accept("ababc") << std::endl;
-	std::cout << !result.accept("ababcababc") << std::endl;
-	std::cout << !result.accept("abab") << std::endl;
-	std::cout << !result.accept("aaaaaaabab") << std::endl;
-	std::cout << !result.accept("aaaaaaababc") << std::endl;
-	std::cout << !result.accept("abababab") << std::endl;
-	std::cout << !result.accept("bab") << std::endl;
-	std::cout << !result.accept("baaaaab") << std::endl;
-	std::cout << !result.accept("baaaaabc") << std::endl;
-	std::cout << !result.accept("baaaaabcccc") << std::endl;
-	std::cout << !result.accept("babbab") << std::endl;
-	std::cout << !result.accept("") << std::endl;
+	isValid = isValid && assertWordRejected("ababc", result);
+	isValid = isValid && assertWordRejected("ababcababc", result);
+	isValid = isValid && assertWordRejected("abab", result);
+	isValid = isValid && assertWordRejected("aaaaaaabab", result);
+	isValid = isValid && assertWordRejected("aaaaaaababc", result);
+	isValid = isValid && assertWordRejected("abababab", result);
+	isValid = isValid && assertWordRejected("bab", result);
+	isValid = isValid && assertWordRejected("baaaaab", result);
+	isValid = isValid && assertWordRejected("baaaaabc", result);
+	isValid = isValid && assertWordRejected("baaaaabcccc", result);
+	isValid = isValid && assertWordRejected("babbab", result);
+	isValid = isValid && assertWordRejected("", result);
 
-	return true;
+	return isValid;
 }
 bool AutomatonTests::runAutomatonDifferenceTests() {
 	//Arange
@@ -141,27 +161,28 @@ bool AutomatonTests::runAutomatonDifferenceTests() {
 	//Act
 	FiniteAutomata result = FiniteAutomata::Difference(firstAutomaton, secondAutomaton);
 	//Assert
-	std::cout << result.accept("aaaaaabbaaabbaaabbaa") << std::endl;
-	std::cout << result.accept("bab") << std::endl;
-	std::cout << result.accept("bbaabbabbaaabbabbaabbaaa") << std::endl;
-	std::cout << result.accept("aaaaaaaaaaaa") << std::endl;
-	std::cout << result.accept("bbbbbbb") << std::endl;
-	std::cout << result.accept("a") << std::endl;
-	std::cout << result.accept("b") << std::endl;
-	std::cout << result.accept("ba") << std::endl;
-	std::cout << result.accept("ab") << std::endl;
-	std::cout << result.accept("") << std::endl;
+	bool isValid = true;
+	isValid = isValid && assertWordAccepted("aaaaaabbaaabbaaabbaa", result);
+	isValid = isValid && assertWordAccepted("bab", result);
+	isValid = isValid && assertWordAccepted("bbaabbabbaaabbabbaabbaaa", result);
+	isValid = isValid && assertWordAccepted("aaaaaaaaaaaa", result);
+	isValid = isValid && assertWordAccepted("bbbbbbb", result);
+	isValid = isValid && assertWordAccepted("a", result);
+	isValid = isValid && assertWordAccepted("b", result);
+	isValid = isValid && assertWordAccepted("ba", result);
+	isValid = isValid && assertWordAccepted("ab", result);
+	isValid = isValid && assertWordAccepted("", result);
 
-	std::cout << !result.accept("aba") << std::endl;
-	std::cout << !result.accept("babab") << std::endl;
-	std::cout << !result.accept("baba") << std::endl;
-	std::cout << !result.accept("abab") << std::endl;
-	std::cout << !result.accept("aaaaaabaaaaaaaaaaa") << std::endl;
-	std::cout << !result.accept("abaaaabbabaababababaaba") << std::endl;
-	std::cout << !result.accept("bbbbbbbbababbbbbbbbbbbb") << std::endl;
-	std::cout << !result.accept("abaabaaaababbbaaba") << std::endl;
-	std::cout << !result.accept("bbabaabbbaabaababa") << std::endl;
-	return true;
+	isValid = isValid && assertWordRejected("aba", result);
+	isValid = isValid && assertWordRejected("babab", result);
+	isValid = isValid && assertWordRejected("baba", result);
+	isValid = isValid && assertWordRejected("abab", result);
+	isValid = isValid && assertWordRejected("aaaaaabaaaaaaaaaaa", result);
+	isValid = isValid && assertWordRejected("abaaaabbabaababababaaba", result);
+	isValid = isValid && assertWordRejected("bbbbbbbbababbbbbbbbbbbb", result);
+	isValid = isValid && assertWordRejected("abaabaaaababbbaaba", result);
+	isValid = isValid && assertWordRejected("bbabaabbbaabaababa", result);
+	return isValid;
 }
 bool AutomatonTests::runAutomatonTotalizationTests() {
 	//Arange
@@ -170,23 +191,24 @@ bool AutomatonTests::runAutomatonTotalizationTests() {
 	//Act
 	result.makeTotal();
 	//Assert
-	std::cout << !result.accept("a") << std::endl;
-	std::cout << !result.accept("b") << std::endl;
-	std::cout << !result.accept("ab") << std::endl;
-	std::cout << !result.accept("ababababab") << std::endl;
-	std::cout << !result.accept("abababababcc") << std::endl;
-	std::cout << !result.accept("c") << std::endl;
-	std::cout << !result.accept("d") << std::endl;
-	std::cout << !result.accept("abd") << std::endl;
-	std::cout << !result.accept("abc") << std::endl;
-	std::cout << !result.accept("") << std::endl;
+	bool isValid = true;
+	isValid = isValid && assertWordRejected("a", result);
+	isValid = isValid && assertWordRejected("b", result);
+	isValid = isValid && assertWordRejected("ab", result);
+	isValid = isValid && assertWordRejected("ababababab", result);
+	isValid = isValid && assertWordRejected("abababababcc", result);
+	isValid = isValid && assertWordRejected("c", result);
+	isValid = isValid && assertWordRejected("d", result);
+	isValid = isValid && assertWordRejected("abd", result);
+	isValid = isValid && assertWordRejected("abc", result);
+	isValid = isValid && assertWordRejected("", result);
 
-	std::cout << result.accept("cd") << std::endl;
-	std::cout << result.accept("acd") << std::endl;
-	std::cout << result.accept("bcd") << std::endl;
-	std::cout << result.accept("babbaaababcd") << std::endl;
-	std::cout << result.accept("ababbaaababcd") << std::endl;
-	return true;
+	isValid = isValid && assertWordAccepted("cd", result);
+	isValid = isValid && assertWordAccepted("acd", result);
+	isValid = isValid && assertWordAccepted("bcd", result);
+	isValid = isValid && assertWordAccepted("babbaaababcd", result);
+	isValid = isValid && assertWordAccepted("ababbaaababcd", result);
+	return isValid;
 }
 bool AutomatonTests::runAutomatonDeterminizationTests() {
 	//Arange
@@ -195,28 +217,29 @@ bool AutomatonTests::runAutomatonDeterminizationTests() {
 	//Act
 	result.makeDeterministic();
 	//Arrange
-	std::cout << !result.accept("cdcddcdaba") << std::endl;
-	std::cout << !result.accept("cb") << std::endl;
-	std::cout << !result.accept("db") << std::endl;
-	std::cout << !result.accept("da") << std::endl;
+	bool isValid = true;
+	isValid = isValid && assertWordRejected("cdcddcdaba", result);
+	isValid = isValid && assertWordRejected("cb", result);
+	isValid = isValid && assertWordRejected("db", result);
+	isValid = isValid && assertWordRejected("da", result);
 
-	std::cout << result.accept("abcd") << std::endl;
-	std::cout << result.accept("a") << std::endl;
-	std::cout << result.accept("b") << std::endl;
-	std::cout << result.accept("c") << std::endl;
-	std::cout << result.accept("d") << std::endl;
-	std::cout << result.accept("ab") << std::endl;
-	std::cout << result.accept("ac") << std::endl;
-	std::cout << result.accept("ad") << std::endl;
-	std::cout << result.accept("ba") << std::endl;
-	std::cout << result.accept("bc") << std::endl;
-	std::cout << result.accept("bd") << std::endl;
-	std::cout << result.accept("cd") << std::endl;
-	std::cout << result.accept("dc") << std::endl;
-	std::cout << result.accept("ca") << std::endl;
-	std::cout << result.accept("") << std::endl;
+	isValid = isValid && assertWordAccepted("abcd", result);
+	isValid = isValid && assertWordAccepted("a", result);
+	isValid = isValid && assertWordAccepted("b", result);
+	isValid = isValid && assertWordAccepted("c", result);
+	isValid = isValid && assertWordAccepted("d", result);
+	isValid = isValid && assertWordAccepted("ab", result);
+	isValid = isValid && assertWordAccepted("ac", result);
+	isValid = isValid && assertWordAccepted("ad", result);
+	isValid = isValid && assertWordAccepted("ba", result);
+	isValid = isValid && assertWordAccepted("bc", result);
+	isValid = isValid && assertWordAccepted("bd", result);
+	isValid = isValid && assertWordAccepted("cd", result);
+	isValid = isValid && assertWordAccepted("dc", result);
+	isValid = isValid && assertWordAccepted("ca", result);
+	isValid = isValid && assertWordAccepted("", result);
 
-	return true;
+	return isValid;
 }
 bool AutomatonTests::runAutomatonReverseTests() {
 	//Arange
@@ -225,25 +248,26 @@ bool AutomatonTests::runAutomatonReverseTests() {
 	//Act
 	result.reverse();
 	//Assert
-	std::cout << !result.accept("ab") << std::endl;
-	std::cout << !result.accept("ccc") << std::endl;
-	std::cout << !result.accept("ddd") << std::endl;
-	std::cout << !result.accept("ad") << std::endl;
-	std::cout << !result.accept("bd") << std::endl;
-	std::cout << !result.accept("bc") << std::endl;
-	std::cout << !result.accept("") << std::endl;
+	bool isValid = true;
+	isValid = isValid && assertWordRejected("ab", result);
+	isValid = isValid && assertWordRejected("ccc", result);;
+	isValid = isValid && assertWordRejected("ddd", result);;
+	isValid = isValid && assertWordRejected("ad", result);
+	isValid = isValid && assertWordRejected("bd", result);
+	isValid = isValid && assertWordRejected("bc", result);
+	isValid = isValid && assertWordRejected("", result);
 
-	std::cout << result.accept("ac") << std::endl;
-	std::cout << result.accept("cabaab") << std::endl;
-	std::cout << result.accept("d") << std::endl;
-	std::cout << result.accept("da") << std::endl;
-	std::cout << result.accept("db") << std::endl;
-	std::cout << result.accept("cb") << std::endl;
-	std::cout << result.accept("ca") << std::endl;
-	std::cout << result.accept("c") << std::endl;
-	std::cout << result.accept("dabaabaab") << std::endl;
+	isValid = isValid && assertWordAccepted("ac", result);
+	isValid = isValid && assertWordAccepted("cabaab", result);
+	isValid = isValid && assertWordAccepted("d", result);
+	isValid = isValid && assertWordAccepted("da", result);
+	isValid = isValid && assertWordAccepted("db", result);
+	isValid = isValid && assertWordAccepted("cb", result);
+	isValid = isValid && assertWordAccepted("ca", result);
+	isValid = isValid && assertWordAccepted("c", result);
+	isValid = isValid && assertWordAccepted("dabaabaab", result);
 
-	return true;
+	return isValid;
 }
 bool AutomatonTests::runAutomatonMinimizationTests() {
 	//Arange
@@ -252,64 +276,65 @@ bool AutomatonTests::runAutomatonMinimizationTests() {
 	//Act
 	result.minimize();
 	//Arrange
-	std::cout << !result.accept("cdcddcdaba") << std::endl;
-	std::cout << !result.accept("cb") << std::endl;
-	std::cout << !result.accept("db") << std::endl;
-	std::cout << !result.accept("da") << std::endl;
+	bool isValid = true;
+	isValid = isValid && assertWordRejected("cdcddcdaba", result);
+	isValid = isValid && assertWordRejected("cb", result);
+	isValid = isValid && assertWordRejected("db", result);
+	isValid = isValid && assertWordRejected("da", result);
 
-	std::cout << result.accept("abcd") << std::endl;
-	std::cout << result.accept("a") << std::endl;
-	std::cout << result.accept("b") << std::endl;
-	std::cout << result.accept("c") << std::endl;
-	std::cout << result.accept("d") << std::endl;
-	std::cout << result.accept("ab") << std::endl;
-	std::cout << result.accept("ac") << std::endl;
-	std::cout << result.accept("ad") << std::endl;
-	std::cout << result.accept("ba") << std::endl;
-	std::cout << result.accept("bc") << std::endl;
-	std::cout << result.accept("bd") << std::endl;
-	std::cout << result.accept("cd") << std::endl;
-	std::cout << result.accept("dc") << std::endl;
-	std::cout << result.accept("ca") << std::endl;
-	std::cout << result.accept("") << std::endl;
-	return true;
+	isValid = isValid && assertWordAccepted("abcd", result);
+	isValid = isValid && assertWordAccepted("a", result);
+	isValid = isValid && assertWordAccepted("b", result);
+	isValid = isValid && assertWordAccepted("c", result);
+	isValid = isValid && assertWordAccepted("d", result);
+	isValid = isValid && assertWordAccepted("ab", result);
+	isValid = isValid && assertWordAccepted("ac", result);
+	isValid = isValid && assertWordAccepted("ad", result);
+	isValid = isValid && assertWordAccepted("ba", result);
+	isValid = isValid && assertWordAccepted("bc", result);
+	isValid = isValid && assertWordAccepted("bd", result);
+	isValid = isValid && assertWordAccepted("cd", result);
+	isValid = isValid && assertWordAccepted("dc", result);
+	isValid = isValid && assertWordAccepted("ca", result);
+	isValid = isValid && assertWordAccepted("", result);
+	return isValid;
 }
 bool AutomatonTests::runAutomatonOperationsTests() {
 	std::cout << "Union tests:" << std::endl;
-	runAutomatonUnionTests();
+	bool unionTest = runAutomatonUnionTests();
 	std::cout << "Concatenation tests:" << std::endl;
-	runAutomatonConcatenationTests();
+	bool concatenationTests = runAutomatonConcatenationTests();
 	std::cout << "KleeneStar tests:" << std::endl;
-	runAutomatonKleeneStarTests();
+	bool kleeneStarTests = runAutomatonKleeneStarTests();
 	std::cout << "Complement tests:" << std::endl;
-	runAutomatonComplementTests();
+	bool complementTests = runAutomatonComplementTests();
 	std::cout << "Intersection tests:" << std::endl;
-	runAutomatonIntersectionTests();
+	bool intersectionTests = runAutomatonIntersectionTests();
 	std::cout << "Difference tests:" << std::endl;
-	runAutomatonDifferenceTests();
-	return true;
+	bool differenceTests = runAutomatonDifferenceTests();
+	return unionTest && concatenationTests && kleeneStarTests && complementTests && intersectionTests && differenceTests;
 }
 bool AutomatonTests::runAutomatonFunctionsTests() {
 	std::cout << "Totalization tests:" << std::endl;
-	runAutomatonTotalizationTests();
+	bool totalizationTests = runAutomatonTotalizationTests();
 	std::cout << "Determinization tests:" << std::endl;
-	runAutomatonDeterminizationTests();
+	bool determinizationTests = runAutomatonDeterminizationTests();
 	std::cout << "Reverse tests:" << std::endl;
-	runAutomatonReverseTests();
+	bool reverseTests = runAutomatonReverseTests();
 	std::cout << "Minimization tests:" << std::endl;
-	runAutomatonMinimizationTests();
+	bool minimizationTests = runAutomatonMinimizationTests();
 	std::cout << "Is empty language tests:" << std::endl;
-	isEmptyLanguageTests();
+	bool emptyLanguageTests = isEmptyLanguageTests();
 	std::cout << "Get RegEx tests:" << std::endl;
-	runAutomatonGetRegExTests();
-	return true;
+	bool getRegExTests = runAutomatonGetRegExTests();
+	return totalizationTests && determinizationTests && reverseTests && minimizationTests && emptyLanguageTests && getRegExTests;
 }
 bool AutomatonTests::runAutomatonTests() {
 	std::cout << "Automaton operation tests:" << std::endl;
-	runAutomatonOperationsTests();
+	bool operationsTests = runAutomatonOperationsTests();
 	std::cout << "Automaton functions tests:" << std::endl;
-	runAutomatonFunctionsTests();
-	return true;
+	bool functionsTests = runAutomatonFunctionsTests();
+	return operationsTests && functionsTests;
 }
 bool AutomatonTests::isEmptyLanguageTests() {
 	//Arange
@@ -323,7 +348,7 @@ bool AutomatonTests::isEmptyLanguageTests() {
 	//Assert
 	std::cout << result << std::endl;
 	std::cout << !result2 << std::endl;
-	return true;
+	return result && !result2;
 }
 bool AutomatonTests::runAutomatonGetRegExTests() {
 	//Arange
@@ -333,23 +358,23 @@ bool AutomatonTests::runAutomatonGetRegExTests() {
 	//RegExHandler regEx = automata.getRegEx();
 	FiniteAutomata result(automata.getRegEx());
 	//Assert
+	bool isValid = true;
+	isValid = isValid && assertWordAccepted("abcd", result);
+	isValid = isValid && assertWordAccepted("aabcd", result);
+	isValid = isValid && assertWordAccepted("babcd", result);
+	isValid = isValid && assertWordAccepted("babababbbbaababcd", result);
+	isValid = isValid && assertWordAccepted("aabababbbbaababcd", result);
+	isValid = isValid && assertWordAccepted("dc", result);
 
-	std::cout << result.accept("abcd") << std::endl;
-	std::cout << result.accept("aabcd") << std::endl;
-	std::cout << result.accept("babcd") << std::endl;
-	std::cout << result.accept("babababbbbaababcd") << std::endl;
-	std::cout << result.accept("aabababbbbaababcd") << std::endl;
-	std::cout << result.accept("dc") << std::endl;
-
-	std::cout << !result.accept("a") << std::endl;
-	std::cout << !result.accept("ab") << std::endl;
-	std::cout << !result.accept("abc") << std::endl;
-	std::cout << !result.accept("b") << std::endl;
-	std::cout << !result.accept("c") << std::endl;
-	std::cout << !result.accept("d") << std::endl;
-	std::cout << !result.accept("bcd") << std::endl;
-	std::cout << !result.accept("") << std::endl;
-	std::cout << !result.accept("ababababbbababc") << std::endl;
-	std::cout << !result.accept("ababababbbababd") << std::endl;
-	return true;
+	isValid = isValid && assertWordRejected("a", result);
+	isValid = isValid && assertWordRejected("ab", result);
+	isValid = isValid && assertWordRejected("abc", result);
+	isValid = isValid && assertWordRejected("b", result);
+	isValid = isValid && assertWordRejected("c", result);
+	isValid = isValid && assertWordRejected("d", result);
+	isValid = isValid && assertWordRejected("bcd", result);
+	isValid = isValid && assertWordRejected("", result);
+	isValid = isValid && assertWordRejected("ababababbbababc", result);
+	isValid = isValid && assertWordRejected("ababababbbababd", result);
+	return isValid;
 }

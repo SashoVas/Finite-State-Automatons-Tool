@@ -10,8 +10,8 @@ public:
 };
 
 bool Tests::runAllTests() {
-	AutomatonTests::runAutomatonTests();
-	RegExTests::runRegularExpressionTests();
-	CollectionsTests::runCollectionsTests();
-	return true;
+	bool automatonTests = AutomatonTests::runAutomatonTests();
+	bool regExTests = RegExTests::runRegularExpressionTests();
+	bool collectionTests = CollectionsTests::runCollectionsTests();
+	return automatonTests && regExTests && collectionTests;
 }

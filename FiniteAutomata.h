@@ -28,6 +28,10 @@ private:
 	CustomCollection<int> getNodeStates(const CustomCollection<int>& nodes, char symbol)const;
 	RegEx* generateRegEx(int i, int j, int k, bool epsilon)const;
 	bool haveFinal(const CustomCollection<int>& nodes)const;
+
+	void setReverseMultipleStart(FiniteAutomata& result)const;
+	void setReverseTransitions(FiniteAutomata& result)const;
+	void setFinalToBeStart(FiniteAutomata& result)const;
 	//
 public:
 	friend class AutomatonFileHandler;
@@ -70,10 +74,3 @@ public:
 	static FiniteAutomata Intersection(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
 	static FiniteAutomata Difference(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
 };
-
-//FiniteAutomata Union(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
-//FiniteAutomata Concatenation(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
-//FiniteAutomata KleeneStar(const FiniteAutomata& lhs); 
-//FiniteAutomata Complement(const FiniteAutomata& lhs);
-//FiniteAutomata Intersection(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
-//FiniteAutomata Difference(const FiniteAutomata& lhs, const FiniteAutomata& rhs);

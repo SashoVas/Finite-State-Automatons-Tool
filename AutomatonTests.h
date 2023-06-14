@@ -1,5 +1,10 @@
 #pragma once
+#include "MyString.h"
+#include "FiniteAutomata.h"
 class AutomatonTests {
+private:
+	static bool assertWordAccepted(const MyString& word,const FiniteAutomata& automata);
+	static bool assertWordRejected(const MyString& word,const FiniteAutomata& automata);
 public:
 	static bool runAutomatonTests();
 

@@ -1,39 +1,44 @@
 #include <iostream>
 #include "RegExTests.h"
-#include "RegExHandler.h"
+
+bool RegExTests::assertRegExToStringEquals(const RegExHandler& regEx, const MyString& value) {
+	bool result = regEx.getString() == value;
+	std::cout << result << std::endl;
+	return result;
+}
+
 bool RegExTests::runRegularExpressionTests() {
 	std::cout << "RegEx parse tests:" << std::endl;
-	runRegularExpressionGetRegExTests();
-	return true;
+	return runRegularExpressionGetRegExTests();
 }
 bool RegExTests::runRegularExpressionGetRegExTests() {
+	bool isValid = true;
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("a(a+b)*b+b(a+b)*a"), "(a((a+b))*b+b((a+b))*a)");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("a"), "a");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("ab"), "ab");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("ab+ac"), "(ab+ac)");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("(ab+ac)*"), "((ab+ac))*");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("(ab+ac)*+a"), "(((ab+ac))*+a)");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("(ab+ac)*+a+b"), "(((ab+ac))*+(a+b))");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("(ab+ac)*+a+ba"), "(((ab+ac))*+(a+ba))");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("((ab+ac)*+a+ba)c"), "(((ab+ac))*+(a+ba))c");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("((ab+ac)*+a+ba)c+d"), "((((ab+ac))*+(a+ba))c+d)");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("((ab+ac)*+a+ba)c+d+b"), "((((ab+ac))*+(a+ba))c+(d+b))");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("((ab+ac)*+a+ba)c+d+(b)*"), "((((ab+ac))*+(a+ba))c+(d+(b)*))");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("(a)*"), "(a)*");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("(a)*+(b)*"), "((a)*+(b)*)");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("((a)*+(b)*)*"), "(((a)*+(b)*))*");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("((ab)*+(bb)*)*"), "(((ab)*+(bb)*))*");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("abcd"), "abcd");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("(a)*(b)*"), "(a)*(b)*");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("((a)*(b)*)*"), "((a)*(b)*)*");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("(((a)*(b)*)*)*"), "(((a)*(b)*)*)*");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("(((a)*(b)*)*)*+(((a)*(b)*)*)*"), "((((a)*(b)*)*)*+(((a)*(b)*)*)*)");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("((((a)*(b)*)*)*+(((a)*(b)*)*)*)c"), "((((a)*(b)*)*)*+(((a)*(b)*)*)*)c");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("(((a)*(b)*)*)*+(((a)*(b)*)*)*c"), "((((a)*(b)*)*)*+(((a)*(b)*)*)*c)");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)"), "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)"), "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)");
+	isValid = isValid && assertRegExToStringEquals(RegExHandler("ab(a+c)*"), "ab((a+c))*");
 
-	std::cout << ((RegExHandler("a(a+b)*b+b(a+b)*a")).getString() == "(a((a+b))*b+b((a+b))*a)") << std::endl;
-	std::cout << ((RegExHandler("a")).getString() == "a") << std::endl;
-	std::cout << ((RegExHandler("ab")).getString() == "ab") << std::endl;
-	std::cout << ((RegExHandler("ab+ac")).getString() == "(ab+ac)") << std::endl;
-	std::cout << ((RegExHandler("(ab+ac)*")).getString() == "((ab+ac))*") << std::endl;
-	std::cout << ((RegExHandler("(ab+ac)*+a")).getString() == "(((ab+ac))*+a)") << std::endl;
-	std::cout << ((RegExHandler("(ab+ac)*+a+b")).getString() == "(((ab+ac))*+(a+b))") << std::endl;
-	std::cout << ((RegExHandler("(ab+ac)*+a+ba")).getString() == "(((ab+ac))*+(a+ba))") << std::endl;
-	std::cout << ((RegExHandler("((ab+ac)*+a+ba)c")).getString() == "(((ab+ac))*+(a+ba))c") << std::endl;
-	std::cout << ((RegExHandler("((ab+ac)*+a+ba)c+d")).getString() == "((((ab+ac))*+(a+ba))c+d)") << std::endl;
-	std::cout << ((RegExHandler("((ab+ac)*+a+ba)c+d+b")).getString() == "((((ab+ac))*+(a+ba))c+(d+b))") << std::endl;
-	std::cout << ((RegExHandler("((ab+ac)*+a+ba)c+d+(b)*")).getString() == "((((ab+ac))*+(a+ba))c+(d+(b)*))") << std::endl;
-	std::cout << ((RegExHandler("(a)*")).getString() == "(a)*") << std::endl;
-	std::cout << ((RegExHandler("(a)*+(b)*")).getString() == "((a)*+(b)*)") << std::endl;
-	std::cout << ((RegExHandler("((a)*+(b)*)*")).getString() == "(((a)*+(b)*))*") << std::endl;
-	std::cout << ((RegExHandler("((ab)*+(bb)*)*")).getString() == "(((ab)*+(bb)*))*") << std::endl;
-	std::cout << ((RegExHandler("abcd")).getString() == "abcd") << std::endl;
-	std::cout << ((RegExHandler("(a)*(b)*")).getString() == "(a)*(b)*") << std::endl;
-	std::cout << ((RegExHandler("((a)*(b)*)*")).getString() == "((a)*(b)*)*") << std::endl;
-	std::cout << ((RegExHandler("(((a)*(b)*)*)*")).getString() == "(((a)*(b)*)*)*") << std::endl;
-	std::cout << ((RegExHandler("(((a)*(b)*)*)*+(((a)*(b)*)*)*")).getString() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*)") << std::endl;
-	std::cout << ((RegExHandler("((((a)*(b)*)*)*+(((a)*(b)*)*)*)c")).getString() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*)c") << std::endl;
-	std::cout << ((RegExHandler("(((a)*(b)*)*)*+(((a)*(b)*)*)*c")).getString() == "((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
-	std::cout << ((RegExHandler("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)")).getString() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
-	std::cout << ((RegExHandler("a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)")).getString() == "a((((a)*(b)*)*)*+(((a)*(b)*)*)*c)") << std::endl;
-	std::cout << ((RegExHandler("ab(a+c)*")).getString() == "ab((a+c))*") << std::endl;
-
-	return true;
+	return isValid;
 }
