@@ -4,12 +4,13 @@ A implementacion of the basic functionalities of finite state automatons.
 A Polymorphic Hierarchy implemented with a tree for easy usage of regular expressions.
 
 ### Usage
-The main functionalities of regExHandler.
+The main functionalities of regExHandler:
 Return type | Function | Description 
 --- | --- | --- 
 RegEx* | buildFromString() | Algorithm for parsing string to regEx tree 
 MyString | getString() | Returns a string that represents the regular expression
 FiniteAutomata | getAutomata() | Return a FiniteAutomata with the same language as the regular expression
+RegEx* | buildRegExFromAutomaton() | Returns a RegEx* with the same language as the automaton
 
 ## Example
 For a regular expression "(ab+cd)(e+f)*a" the tree would look like this.
