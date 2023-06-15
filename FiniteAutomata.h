@@ -48,14 +48,16 @@ public:
 	void addTransition(int index, const Transition& transition);
 	void makeFinal(int index);
 
-	RegExHandler getRegEx()const;
 	FiniteAutomata getReverse()const;
-	bool isEmptyLanguage()const;
 
 	void makeDeterministic();
 	void makeTotal();
 	void minimize();
 	void reverse();
+
+	bool isEmptyLanguage()const;
+
+	RegExHandler getRegEx()const;
 
 	FiniteAutomata& UnionWith(const FiniteAutomata& rhs);
 	FiniteAutomata& ConcatenationWith(const FiniteAutomata& rhs);

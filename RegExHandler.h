@@ -6,6 +6,8 @@ class RegExHandler{
 	void copyFrom(const RegExHandler& other);
 	void moveFrom(RegExHandler&& other);
 	void free();
+
+	//static RegEx* generateRegExFromAutomatonInRange(int i, int j, int k, bool epsilon,const FiniteAutomata&);
 public:
 	RegExHandler(RegEx* ptr);
 	RegExHandler(const MyString& str);
@@ -15,6 +17,7 @@ public:
 	RegExHandler(RegExHandler&& other);
 
 	static RegEx* buildRegExFromString(const MyString& str) ;
+	//static RegEx* buildRegExFromAutomaton(const FiniteAutomata& str) ;
 	static RegEx* getRegExFromString(const MyString& str, int& currentPosition);
 	static RegEx* makeUnion(RegEx* left, RegEx* right);
 	static RegEx* makeConcatenation(RegEx* left, RegEx* right);

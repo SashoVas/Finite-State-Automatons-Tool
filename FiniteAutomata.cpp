@@ -322,19 +322,19 @@ void FiniteAutomata::makeDeterministic() {
 	CustomCollection<StateTuple>stateTable(128);
 	MyQueue<int>queue;
 	CustomCollection<int>newStart;
+
 	if (multiplStarts)
-	{
 		newStart = startStates;
-	}
 	else
 		newStart.add(startNode);
+
 	queue.push(0);
 	stateTable.add(StateTuple(std::move(newStart), 0));
 	newAutomaton.addState();
+
 	if (finalStates.check(startNode))
-	{
 		newAutomaton.makeFinal(0);
-	}
+
 	while (!queue.isEmpty())
 	{
 		int currentInNew = queue.peek();
@@ -358,9 +358,7 @@ void FiniteAutomata::makeDeterministic() {
 				newAutomaton.addTransition(currentInNew, Transition(newAutomaton.nodes - 1, currentChar));
 			}
 			else
-			{
 				newAutomaton.addTransition(currentInNew, Transition(stateTable[nextStatesPositionInTable].newStateIndex, currentChar));
-			}
 
 		}
 	}
@@ -530,9 +528,7 @@ void FiniteAutomata::setReverseTransitions(FiniteAutomata& result)const {
 	for (int i = 0; i < nodes; i++)
 	{
 		for (int j = 0; j < automata[i].getSize(); j++)
-		{
 			result.addTransition(automata[i][j].dest, Transition(i, automata[i][j].symbol));
-		}
 	}
 }
 
@@ -542,9 +538,7 @@ void FiniteAutomata::setReverseMultipleStart(FiniteAutomata& result) const{
 	for (int i = 0; i < nodes; i++)
 	{
 		if (finalStates.check(i))
-		{
 			newFinals.add(i);
-		}
 	}
 	result.startStates = std::move(newFinals);
 
@@ -552,19 +546,13 @@ void FiniteAutomata::setReverseMultipleStart(FiniteAutomata& result) const{
 	for (int i = 0; i < nodes; i++)
 	{
 		if (!finalStates.check(i))
-		{
 			continue;
-		}
 		for (int j = 0; j < result.automata[i].getSize(); j++)
-		{
 			result.addTransition(nodes, Transition(result.automata[i][j].dest, result.automata[i][j].symbol));
-		}
 	}
 	result.startNode = nodes;
 	if (finalStates.check(startNode))
-	{
 		result.makeFinal(nodes);
-	}
 }
 void FiniteAutomata::setFinalToBeStart(FiniteAutomata& result)const {
 	for (int i = 0; i < nodes; i++)
@@ -584,14 +572,12 @@ FiniteAutomata FiniteAutomata::getReverse() const {
 	setReverseTransitions(result);
 
 	result.makeFinal(startNode);
+
 	if (finalStates.getTruesCount() > 1)
-	{
 		setReverseMultipleStart(result);
-	}
 	else
-	{
 		setFinalToBeStart(result);
-	}
+
 	return result;
 }
 void FiniteAutomata::reverse() {

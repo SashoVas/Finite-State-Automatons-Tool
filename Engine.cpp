@@ -107,7 +107,9 @@ void Engine::run() {
 			default:
 				break;
 			}
-
+			std::cout << "-----------------------------------" << std::endl;
+			std::cout << "Successful operation" << std::endl;
+			std::cout << "-----------------------------------" << std::endl;
 
 		}
 	}

@@ -49,6 +49,9 @@ RegExHandler& RegExHandler::operator=(RegExHandler&& other) {
 	return *this;
 }
 
+//RegEx* RegExHandler::buildRegExFromAutomaton(const FiniteAutomata& str) {
+//
+//}
 
 RegEx* RegExHandler::buildRegExFromString(const MyString& str) {
 	int a = 0;
@@ -103,6 +106,9 @@ RegEx* RegExHandler::getRegExFromString(const MyString& str, int& currentPositio
 			result = new UnionRegEx(result, right);
 			if (str[currentPosition] == ')')
 				return result;
+		}
+		else if (str[currentPosition] == '.') {
+			continue;
 		}
 		else {
 			RegEx* symbol = new Symbol(str[currentPosition]);
