@@ -11,7 +11,7 @@ RegEx* | buildFromString() | Algorithm for parsing string to regEx tree
 MyString | getString() | Returns a string that represents the regular expression
 FiniteAutomata | getAutomata() | Return a FiniteAutomata with the same language as the regular expression
 
-### Example
+## Example
 For a regular expression "(ab+cd)(e+f)*a" the tree would look like this.
 ```mermaid
   flowchart TB
@@ -59,7 +59,8 @@ FiniteAutomata | Complement(FiniteAutomata lhs) | Returns an automaton that is t
 FiniteAutomata | Intersection(FiniteAutomata lhs,FiniteAutomata rhs) | Returns an automaton that is the intersection of lhs and rhs
 FiniteAutomata | Difference(FiniteAutomata lhs,FiniteAutomata rhs) | Returns an automaton that is the difference of lhs and rhs
   
- ### Example
+ ## Example
+ ### RegEx to automaton
 For regular expression "(a+b)*cd" the automaton whould look like this:
 ```mermaid
   flowchart LR
@@ -79,7 +80,8 @@ For regular expression "(a+b)*cd" the automaton whould look like this:
     7(7) -->|d| 8
     8((( 8 )))
 ```
-Start state is 4, and final state is 8. This automaton is build by using the union, concatenation and kleene star operations.<br />
+Start state is 4, and final state is 8. This automaton is build by using the union, concatenation and kleene star operations.
+### Determization 
 After determization the automaton would look like this:
   ```mermaid
   flowchart LR
@@ -100,7 +102,8 @@ After determization the automaton would look like this:
     4(4) -->|a,b,c,d| 4 
     5((( 5 ))) -->|a,b,c,d| 4 
 ```
-Start state is 0, and final state is 5.<br />
+Start state is 0, and final state is 5.
+### Minimization
 After minimization the automaton would look like this:
 ```mermaid
   flowchart LR
@@ -113,5 +116,6 @@ After minimization the automaton would look like this:
     3((( 3 ))) -->|a,b,c,d| 2 
 
 ```
-Start state is 0, and end state is 3. The automaton is minimized by the Brzozowski theorem. <br />
+Start state is 0, and end state is 3. The automaton is minimized by the Brzozowski theorem. 
+### GetRegEx
 The regEx that will be returned by getRegEx() would be "(c+((a+b)+$)((a+b))*c)d" which is equal to "(a+b)*cd". (The symbol '$' is considered epsilon)
