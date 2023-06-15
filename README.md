@@ -63,6 +63,9 @@ FiniteAutomata | Difference(FiniteAutomata lhs,FiniteAutomata rhs) | Returns an 
 For regular expression "(a+b)*cd" the automaton whould look like this:
 ```mermaid
   flowchart LR
+    4{4} -->|a| 1
+    4{4} -->|b| 3
+    4{4} -->|c| 6
     0(0) -->|a| 1 
     1(1) -->|a| 1
     1(1) -->|b| 3
@@ -71,9 +74,6 @@ For regular expression "(a+b)*cd" the automaton whould look like this:
     3(3) -->|a| 1
     3(3) -->|b| 3
     3(3) -->|c| 6
-    4{4} -->|a| 1
-    4{4} -->|b| 3
-    4{4} -->|c| 6
     5(5) -->|c| 6
     6(6) -->|d| 8
     7(7) -->|d| 8
