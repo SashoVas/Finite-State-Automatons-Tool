@@ -1,10 +1,10 @@
 # Finite-State-Automatons-Tool
-A implementacion of the basic functionalities of finite state automatons
+A implementacion of the basic functionalities of finite state automatons.
 # RegEx
-A Polymorphic Hierarchy implemented with a tree for easy usage of regular expressions
+A Polymorphic Hierarchy implemented with a tree for easy usage of regular expressions.
 
 ### Usage
-The main functionalities of regExHandler
+The main functionalities of regExHandler.
 Return type | Function | Description 
 --- | --- | --- 
 RegEx* | buildFromString() | Algorithm for parsing string to regEx tree 
@@ -12,7 +12,7 @@ MyString | getString() | Returns a string that represents the regular expression
 FiniteAutomata | getAutomata() | Return a FiniteAutomata with the same language as the regular expression
 
 ### Example
-For a regular expression "(ab+cd)(e+f)*a" the tree would look like this
+For a regular expression "(ab+cd)(e+f)*a" the tree would look like this.
 ```mermaid
   flowchart TB
     A(Concatenation) --> A1((a)) & B1((b))
@@ -25,7 +25,7 @@ For a regular expression "(ab+cd)(e+f)*a" the tree would look like this
 ```
 # FiniteAutomata
 An implementation of finite automata
-A = <Q,Σ,s,δ,F>
+A = <Q,Σ,s,δ,F>.
 ### Properties
 Type | Property | Description 
 --- | --- | --- 
@@ -79,8 +79,8 @@ For regular expression "(a+b)*cd" the automaton whould look like this:
     7(7) -->|d| 8
     8((( 8 )))
 ```
-Start state is 4, and final state is 8<br />
-After determization the automaton would look like this
+Start state is 4, and final state is 8. This automaton is build by using the union, concatenation and kleene star operations.<br />
+After determization the automaton would look like this:
   ```mermaid
   flowchart LR
     0{0} -->|a| 1 
@@ -100,8 +100,8 @@ After determization the automaton would look like this
     4(4) -->|a,b,c,d| 4 
     5((( 5 ))) -->|a,b,c,d| 4 
 ```
-Start state is 0, and final state is 5<br />
-After minimization the automaton would look like this
+Start state is 0, and final state is 5.<br />
+After minimization the automaton would look like this:
 ```mermaid
   flowchart LR
     0{0} -->|a,b| 0 
@@ -113,4 +113,5 @@ After minimization the automaton would look like this
     3((( 3 ))) -->|a,b,c,d| 2 
 
 ```
-Start state is 0, and end state is 3
+Start state is 0, and end state is 3. The automaton is minimized by the Brzozowski theorem. <br />
+The regEx that will be returned by getRegEx() would be "(c+((a+b)+$)((a+b))*c)d" which is equal to "(a+b)*cd". (The symbol '$' is considered epsilon)
