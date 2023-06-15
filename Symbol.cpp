@@ -1,4 +1,6 @@
 #include "Symbol.h"
+#include "FiniteAutomata.h"
+
 namespace {
 	bool isInRange(int l,int r,int val) {
 		return val>=l && val<=r;

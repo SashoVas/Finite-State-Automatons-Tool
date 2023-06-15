@@ -1,6 +1,7 @@
 #pragma once
-#include "FiniteAutomata.h"
+#include "MyString.h"
 
+class FiniteAutomata;
 class RegEx {
 public:
 	virtual bool isEpsilon()const;

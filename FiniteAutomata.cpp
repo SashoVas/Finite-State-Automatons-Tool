@@ -1,6 +1,5 @@
 #include "FiniteAutomata.h"
 #include "MyQueue.hpp"
-#include "RegExHandler.h"
 
 namespace {//Logic for determization
 	struct StateTuple {
@@ -83,7 +82,6 @@ void FiniteAutomata::addTransition(int index, const Transition& transition) {
 void FiniteAutomata::makeFinal(int index) {
 	if (index >= nodes)
 		throw std::invalid_argument("Invalid argument");
-	//finalStates.add(index);
 	finalStates.toggle(index);
 }
 
@@ -126,7 +124,6 @@ void FiniteAutomata::print()const {
 		{
 			std::cout << i << ",";
 		}
-		//std::cout << finalStates[i] << ",";
 	}
 	std::cout << std::endl;
 }
@@ -402,98 +399,9 @@ void FiniteAutomata::makeTotal() {
 		}
 	}
 }
-RegEx* FiniteAutomata::generateRegEx(int i, int j, int k, bool epsilon)const {
-	if (k == 0)
-	{
-		RegEx* result= nullptr;
-		bool isSet = false;
-		for (int symbol = 0; symbol < alphabet.getSize(); symbol++)
-		{
-			if (haveTransitionWihtSymbol(i, alphabet[symbol], j))
-			{
-				if (!isSet)
-				{
-					result = RegExHandler::makeSymbol(alphabet[symbol]);
-					isSet = true;
-				}
-				else
-					result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol(alphabet[symbol]));
-			}
-		}
-		if (i == j && epsilon)
-		{
-			if (isSet&&!result->isEpsilon())
-				result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol('$'));
-			else if(!isSet)
-				result= RegExHandler::makeSymbol('$');
-		}
-		return result;
-	}
-	RegEx* lhs = generateRegEx(i, j, k - 1, epsilon);
-	RegEx* rhs = generateRegEx(i, k - 1, k - 1, epsilon);
-	RegEx* middle = generateRegEx(k - 1, k - 1, k - 1, false);
-	RegEx* end = generateRegEx(k - 1, j, k - 1, epsilon);
-	if (rhs==nullptr || end==nullptr)
-	{
-		delete middle;
-		delete rhs;
-		delete end;
-		return lhs;
-	}
-	if (middle==nullptr)
-		middle = RegExHandler::makeSymbol('$');
-	else
-		middle = RegExHandler::makeKleeneStar(middle);
 
-	//with middle
-	if (rhs->isEpsilon())
-	{
-		delete rhs;
-		rhs = middle;
-		middle = nullptr;
-	}
-	else if (middle->isEpsilon())
-		delete middle;
-	else
-		rhs = RegExHandler::makeConcatenation(rhs,middle);
-	
-	//with end
-	if (rhs->isEpsilon())
-	{
-		delete rhs;
-		rhs = end;
-		end = nullptr;
-	}
-	else if (end->isEpsilon())
-		delete end;
-	else
-		rhs =RegExHandler::makeConcatenation(rhs,end);
-	if (lhs==nullptr)
-		return rhs;
-	if (lhs->getString()==rhs->getString())
-	{
-		delete rhs;
-		return lhs;
-	}
-	lhs = RegExHandler::makeUnion(lhs,rhs);
-	return lhs;
-}
 RegExHandler FiniteAutomata::getRegEx()const {
-	RegEx* result=nullptr;
-	bool isSet = false;
-	for (int i = 0; i < nodes; i++)
-	{
-		if (!finalStates.check(i))
-			continue;
-		if (!isSet)
-		{
-			result = generateRegEx(startNode, i, nodes, true);
-			isSet = true;
-		}
-		else
-			result = RegExHandler::makeUnion(result,generateRegEx(startNode, i, nodes, true));
-	}
-	return RegExHandler( result);
+	return RegExHandler( *this);
 }
 
 bool FiniteAutomata::accept(const MyString& word, int currentLetter, int node)const {

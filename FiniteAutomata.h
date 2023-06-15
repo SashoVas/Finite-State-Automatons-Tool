@@ -4,11 +4,8 @@
 #include "BitSet.h"
 #include "MyString.h"
 #include "Transition.h"
+#include "RegExHandler.h";
 
-//#include "RegExHandler.h";
-//#include "RegEx.h"
-class RegEx;
-class RegExHandler;
 class FiniteAutomata {
 private:
 	int nodes = 0;
@@ -26,7 +23,6 @@ private:
 	bool haveTransitionWihtSymbol(int node, char symbol, int to = -1)const;
 	void addErrorState();
 	CustomCollection<int> getNodeStates(const CustomCollection<int>& nodes, char symbol)const;
-	RegEx* generateRegEx(int i, int j, int k, bool epsilon)const;
 	bool haveFinal(const CustomCollection<int>& nodes)const;
 
 	void setReverseMultipleStart(FiniteAutomata& result)const;
@@ -34,7 +30,7 @@ private:
 	void setFinalToBeStart(FiniteAutomata& result)const;
 	//
 public:
-	friend class AutomatonFileHandler;
+
 	FiniteAutomata(int size);
 	FiniteAutomata() = default;
 	FiniteAutomata(char symbol);
@@ -75,4 +71,8 @@ public:
 	static FiniteAutomata Complement(const FiniteAutomata& lhs);
 	static FiniteAutomata Intersection(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
 	static FiniteAutomata Difference(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
+
+	friend class AutomatonFileHandler;
+	friend RegEx* RegExHandler::generateRegExFromAutomatonInRange(int i, int j, int k, bool epsilon, const FiniteAutomata& automaton);
+	friend RegEx* RegExHandler::buildRegExFromAutomaton(const FiniteAutomata& automaton);
 };

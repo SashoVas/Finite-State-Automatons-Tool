@@ -1,5 +1,7 @@
 #include "KleeneStar.h"
 #include "Symbol.h"
+#include "FiniteAutomata.h"
+
 MyString KleeneStarRegEx::getString()const {
 	return "(" + element->getString() + ")*";
 }

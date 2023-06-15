@@ -3,6 +3,7 @@
 #include "Concatenation.h"
 #include "Union.h"
 #include "Symbol.h"
+#include "FiniteAutomata.h"
 
 void RegExHandler::copyFrom(const RegExHandler& other) {
 	ptr = other.ptr->clone();
@@ -21,6 +22,10 @@ RegExHandler::RegExHandler(RegEx* ptr) {
 RegExHandler::RegExHandler(const MyString& str) {
 	ptr = buildRegExFromString(str);
 }
+RegExHandler::RegExHandler(const FiniteAutomata& automata) {
+	ptr = buildRegExFromAutomaton(automata);
+}
+
 RegExHandler::~RegExHandler() {
 	free();
 }
@@ -48,10 +53,100 @@ RegExHandler& RegExHandler::operator=(RegExHandler&& other) {
 	}
 	return *this;
 }
+RegEx* RegExHandler::generateRegExFromAutomatonInRange(int i, int j, int k, bool epsilon, const FiniteAutomata& automata) {
+	if (k == 0)
+	{
+		RegEx* result = nullptr;
+		bool isSet = false;
+		for (int symbol = 0; symbol < automata.alphabet.getSize(); symbol++)
+		{
+			if (automata.haveTransitionWihtSymbol(i, automata.alphabet[symbol], j))
+			{
+				if (!isSet)
+				{
+					result = RegExHandler::makeSymbol(automata.alphabet[symbol]);
+					isSet = true;
+				}
+				else
+					result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol(automata.alphabet[symbol]));
+			}
+		}
+		if (i == j && epsilon)
+		{
+			if (isSet && !result->isEpsilon())
+				result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol('$'));
+			else if (!isSet)
+				result = RegExHandler::makeSymbol('$');
+		}
+		return result;
+	}
+	RegEx* lhs = generateRegExFromAutomatonInRange(i, j, k - 1, epsilon,automata);
+	RegEx* rhs = generateRegExFromAutomatonInRange(i, k - 1, k - 1, epsilon, automata);
+	RegEx* middle = generateRegExFromAutomatonInRange(k - 1, k - 1, k - 1, false, automata);
+	RegEx* end = generateRegExFromAutomatonInRange(k - 1, j, k - 1, epsilon, automata);
+	if (rhs == nullptr || end == nullptr)
+	{
+		delete middle;
+		delete rhs;
+		delete end;
+		return lhs;
+	}
+	if (middle == nullptr)
+		middle = RegExHandler::makeSymbol('$');
+	else
+		middle = RegExHandler::makeKleeneStar(middle);
 
-//RegEx* RegExHandler::buildRegExFromAutomaton(const FiniteAutomata& str) {
-//
-//}
+	//with middle
+	if (rhs->isEpsilon())
+	{
+		delete rhs;
+		rhs = middle;
+		middle = nullptr;
+	}
+	else if (middle->isEpsilon())
+		delete middle;
+	else
+		rhs = RegExHandler::makeConcatenation(rhs, middle);
+
+	//with end
+	if (rhs->isEpsilon())
+	{
+		delete rhs;
+		rhs = end;
+		end = nullptr;
+	}
+	else if (end->isEpsilon())
+		delete end;
+	else
+		rhs = RegExHandler::makeConcatenation(rhs, end);
+	if (lhs == nullptr)
+		return rhs;
+	if (lhs->getString() == rhs->getString())
+	{
+		delete rhs;
+		return lhs;
+	}
+	lhs = RegExHandler::makeUnion(lhs, rhs);
+	return lhs;
+}
+
+RegEx* RegExHandler::buildRegExFromAutomaton(const FiniteAutomata& automata) {
+	RegEx* result = nullptr;
+	bool isSet = false;
+	for (int i = 0; i < automata.nodes; i++)
+	{
+		if (!automata.finalStates.check(i))
+			continue;
+		if (!isSet)
+		{
+			result = generateRegExFromAutomatonInRange(automata.startNode, i, automata.nodes, true, automata);
+			isSet = true;
+		}
+		else
+			result = RegExHandler::makeUnion(result, generateRegExFromAutomatonInRange(automata.startNode, i, automata.nodes, true, automata));
+	}
+	return result;
+}
 
 RegEx* RegExHandler::buildRegExFromString(const MyString& str) {
 	int a = 0;

@@ -1,5 +1,5 @@
 #include "Concatenation.h"
-
+#include "FiniteAutomata.h"
 ConcatenationRegEx& ConcatenationRegEx::operator=(const ConcatenationRegEx& other) {
 	if (this != &other)
 	{

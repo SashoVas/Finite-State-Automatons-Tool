@@ -1,4 +1,5 @@
 #include "Union.h"
+#include "FiniteAutomata.h"
 
 MyString UnionRegEx::getString()const {
 	return "(" + left->getString() + "+" + right->getString() + ")";
