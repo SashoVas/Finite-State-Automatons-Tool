@@ -14,7 +14,7 @@ MyString ConcatenationRegEx::getString()const {
 	return left->getString() + right->getString();
 }
 RegEx* ConcatenationRegEx::clone()const {
-	return new ConcatenationRegEx(left, right);
+	return new ConcatenationRegEx(left->clone(), right->clone());
 }
 
 void ConcatenationRegEx::copyFrom(const ConcatenationRegEx& other) {

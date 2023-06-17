@@ -5,6 +5,16 @@
 #include "Symbol.h"
 #include "FiniteAutomata.h"
 
+namespace {
+	RegEx* cloneOrNull(RegEx* ptr) {
+		if (ptr == nullptr)
+		{
+			return nullptr;
+		}
+		return ptr->clone();
+	}
+}
+
 void RegExHandler::copyFrom(const RegExHandler& other) {
 	ptr = other.ptr->clone();
 }
@@ -53,37 +63,7 @@ RegExHandler& RegExHandler::operator=(RegExHandler&& other) {
 	}
 	return *this;
 }
-RegEx* RegExHandler::generateRegExFromAutomatonInRange(int i, int j, int k, bool epsilon, const FiniteAutomata& automata) {
-	if (k == 0)
-	{
-		RegEx* result = nullptr;
-		bool isSet = false;
-		for (int symbol = 0; symbol < automata.alphabet.getSize(); symbol++)
-		{
-			if (automata.haveTransitionWihtSymbol(i, automata.alphabet[symbol], j))
-			{
-				if (!isSet)
-				{
-					result = RegExHandler::makeSymbol(automata.alphabet[symbol]);
-					isSet = true;
-				}
-				else
-					result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol(automata.alphabet[symbol]));
-			}
-		}
-		if (i == j && epsilon)
-		{
-			if (isSet && !result->isEpsilon())
-				result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol('$'));
-			else if (!isSet)
-				result = RegExHandler::makeSymbol('$');
-		}
-		return result;
-	}
-	RegEx* lhs = generateRegExFromAutomatonInRange(i, j, k - 1, epsilon,automata);
-	RegEx* rhs = generateRegExFromAutomatonInRange(i, k - 1, k - 1, epsilon, automata);
-	RegEx* middle = generateRegExFromAutomatonInRange(k - 1, k - 1, k - 1, false, automata);
-	RegEx* end = generateRegExFromAutomatonInRange(k - 1, j, k - 1, epsilon, automata);
+RegEx* RegExHandler::processWordWithKleene(RegEx* lhs, RegEx* rhs, RegEx* middle, RegEx* end) {
 	if (rhs == nullptr || end == nullptr)
 	{
 		delete middle;
@@ -130,6 +110,117 @@ RegEx* RegExHandler::generateRegExFromAutomatonInRange(int i, int j, int k, bool
 	return lhs;
 }
 
+RegEx* RegExHandler::buildRegExFromAutomatonWithDP(const FiniteAutomata& automaton) {
+	RegEx***** table = new RegEx****[automaton.nodes];
+	for (int k = 0; k < automaton.nodes; k++)
+	{
+		table[k] = new RegEx ***[automaton.nodes];
+		for (int i = 0; i < automaton.nodes; i++)
+		{
+			table[k][i] = new RegEx ** [automaton.nodes];
+			for (int j = 0; j < automaton.nodes; j++)
+			{
+				table[k][i][j] = new RegEx * [2];
+			}
+		}
+	}
+
+	for (int i = 0; i < automaton.nodes; i++)
+	{
+		for (int j = 0; j < automaton.nodes; j++)
+		{
+			table[0][i][j][0] = kleeneTheoremeBase(i,j,true,automaton);
+			table[0][i][j][1] = kleeneTheoremeBase(i, j, false, automaton);
+		}
+	}
+
+	for (int k = 1; k < automaton.nodes; k++)
+	{
+		for (int i = 0; i < automaton.nodes; i++)
+		{
+			for (int j = 0; j < automaton.nodes; j++)
+			{
+				table[k][i][j][0] = processWordWithKleene(
+					cloneOrNull(table[k - 1][i][j][0]),
+					cloneOrNull(table[k - 1][i][k - 1][0]),
+					cloneOrNull(table[k - 1][k - 1][k - 1][1]),
+					cloneOrNull(table[k - 1][k - 1][j][0]));
+
+				table[k][i][j][1] = processWordWithKleene(
+					cloneOrNull(table[k - 1][i][j][1]), 
+					cloneOrNull(table[k - 1][i][k - 1][1]), 
+					cloneOrNull(table[k - 1][k - 1][k - 1][1]), 
+					cloneOrNull(table[k - 1][k - 1][j][1]));
+			}
+		}
+	}
+	RegEx* result = nullptr;
+	for (int i = 0; i < automaton.nodes; i++)
+	{
+		if (!automaton.finalStates.check(i))
+			continue;
+
+		if (result==nullptr && table[automaton.nodes - 1][automaton.startNode][i][0]!=nullptr)
+			result = table[automaton.nodes - 1][automaton.startNode][i][0]->clone();
+		else if(table[automaton.nodes - 1][automaton.startNode][i][0]!=nullptr)
+			result = makeUnion(result, table[automaton.nodes - 1][automaton.startNode][i][0]->clone());
+	}
+
+	for (int k = 0; k < automaton.nodes; k++)
+	{
+		for (int i = 0; i < automaton.nodes; i++)
+		{
+			for (int j = 0; j < automaton.nodes; j++)
+			{
+				delete table[k][i][j][0];
+				delete table[k][i][j][1];
+				delete[] table[k][i][j];
+			}
+			delete[] table[k][i];
+		}
+		delete [] table[k];
+	}
+	delete [] table;
+	return result;
+}
+
+RegEx* RegExHandler::kleeneTheoremeBase(int i,int j,bool epsilon,const FiniteAutomata& automata) {
+	RegEx* result = nullptr;
+	bool isSet = false;
+	for (int symbol = 0; symbol < automata.alphabet.getSize(); symbol++)
+	{
+		if (automata.haveTransitionWihtSymbol(i, automata.alphabet[symbol], j))
+		{
+			if (!isSet)
+			{
+				result = RegExHandler::makeSymbol(automata.alphabet[symbol]);
+				isSet = true;
+			}
+			else
+				result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol(automata.alphabet[symbol]));
+		}
+	}
+	if (i == j && epsilon)
+	{
+		if (isSet && !result->isEpsilon())
+			result = RegExHandler::makeUnion(result, RegExHandler::makeSymbol('$'));
+		else if (!isSet)
+			result = RegExHandler::makeSymbol('$');
+	}
+	return result;
+}
+RegEx* RegExHandler::generateRegExFromAutomatonInRange(int i, int j, int k, bool epsilon, const FiniteAutomata& automata) {
+	if (k == 0)
+		return kleeneTheoremeBase(i,j,epsilon,automata);
+
+	RegEx* lhs = generateRegExFromAutomatonInRange(i, j, k - 1, epsilon,automata);
+	RegEx* rhs = generateRegExFromAutomatonInRange(i, k - 1, k - 1, epsilon, automata);
+	RegEx* middle = generateRegExFromAutomatonInRange(k - 1, k - 1, k - 1, false, automata);
+	RegEx* end = generateRegExFromAutomatonInRange(k - 1, j, k - 1, epsilon, automata);
+	
+	return processWordWithKleene(lhs,rhs,middle,end);
+}
+
 RegEx* RegExHandler::buildRegExFromAutomaton(const FiniteAutomata& automata) {
 	RegEx* result = nullptr;
 	bool isSet = false;
@@ -140,10 +231,18 @@ RegEx* RegExHandler::buildRegExFromAutomaton(const FiniteAutomata& automata) {
 		if (!isSet)
 		{
 			result = generateRegExFromAutomatonInRange(automata.startNode, i, automata.nodes, true, automata);
-			isSet = true;
+			if (result!=nullptr)
+			{
+				isSet = true;
+			}
 		}
-		else
-			result = RegExHandler::makeUnion(result, generateRegExFromAutomatonInRange(automata.startNode, i, automata.nodes, true, automata));
+		else{
+			RegEx* toUnion = generateRegExFromAutomatonInRange(automata.startNode, i, automata.nodes, true, automata);
+			if (toUnion!=nullptr)
+			{
+				result = RegExHandler::makeUnion(result, toUnion);
+			}
+		}
 	}
 	return result;
 }

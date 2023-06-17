@@ -73,6 +73,7 @@ public:
 	static FiniteAutomata Difference(const FiniteAutomata& lhs, const FiniteAutomata& rhs);
 
 	friend class AutomatonFileHandler;
-	friend RegEx* RegExHandler::generateRegExFromAutomatonInRange(int i, int j, int k, bool epsilon, const FiniteAutomata& automaton);
 	friend RegEx* RegExHandler::buildRegExFromAutomaton(const FiniteAutomata& automaton);
+	friend RegEx* RegExHandler::buildRegExFromAutomatonWithDP(const FiniteAutomata& automaton);
+	friend RegEx* RegExHandler::kleeneTheoremeBase(int i, int j, bool epsilon, const FiniteAutomata& automata);
 };

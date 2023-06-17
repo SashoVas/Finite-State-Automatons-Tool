@@ -7,7 +7,7 @@ MyString KleeneStarRegEx::getString()const {
 }
 
 RegEx* KleeneStarRegEx::clone()const {
-	return new KleeneStarRegEx(element);
+	return new KleeneStarRegEx(element->clone());
 }
 
 void KleeneStarRegEx::copyFrom(const KleeneStarRegEx& other) {

@@ -6,7 +6,7 @@ MyString UnionRegEx::getString()const {
 }
 
 RegEx* UnionRegEx::clone()const {
-	return new UnionRegEx(left, right);
+	return new UnionRegEx(left->clone(), right->clone());
 }
 
 void UnionRegEx::copyFrom(const UnionRegEx& other) {

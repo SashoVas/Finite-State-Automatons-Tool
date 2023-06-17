@@ -6,7 +6,7 @@ class RegExHandler{
 	void copyFrom(const RegExHandler& other);
 	void moveFrom(RegExHandler&& other);
 	void free();
-
+	static RegEx* processWordWithKleene(RegEx* lhs, RegEx* rhs, RegEx* middle, RegEx* end);
 public:
 	RegExHandler(RegEx* ptr);
 	RegExHandler(const MyString& str);
@@ -16,8 +16,11 @@ public:
 	RegExHandler(const RegExHandler& other);
 	RegExHandler(RegExHandler&& other);
 
+	static RegEx* kleeneTheoremeBase(int i, int j, bool epsilon, const FiniteAutomata& automata);
 	static RegEx* generateRegExFromAutomatonInRange(int i, int j, int k, bool epsilon, const FiniteAutomata& automata);
 	static RegEx* buildRegExFromAutomaton(const FiniteAutomata& automata) ;
+	static RegEx* buildRegExFromAutomatonWithDP(const FiniteAutomata& automaton);
+
 
 	static RegEx* buildRegExFromString(const MyString& str) ;
 	static RegEx* getRegExFromString(const MyString& str, int& currentPosition);
