@@ -10,7 +10,8 @@ Return type | Function | Description
 RegEx* | buildFromString() | Algorithm for parsing string to regEx tree 
 MyString | getString() | Returns a string that represents the regular expression
 FiniteAutomata | getAutomata() | Return a FiniteAutomata with the same language as the regular expression
-RegEx* | buildRegExFromAutomaton() | Returns a RegEx* with the same language as the automaton
+RegEx* | buildRegExFromAutomaton() | Returns a RegEx* with the same language as the automaton using kleene theorem
+RegEx* | buildRegExFromAutomatonWithDP() | Returns a RegEx* with the same language as the automaton using kleene theorem optimized with dynamic programing
 
 ## Example
 For a regular expression "(ab+cd)(e+f)*a" the tree would look like this.
@@ -52,7 +53,8 @@ void | makeTotal() | Makes the automaton total
 void | reverse() | Reverses the automaton
 void | minimize() | Minimizes the automaton
 bool | isEmptyLanguage() | Returns true if the language of the automaton is the empty set
-RegExHandler | getRegEx() | Returns a regEx with the same language as the automaton
+RegExHandler | getRegExSlow() | Returns a regEx with the same language as the automaton (with no optimization)
+RegExHandler | getRegExFast() | Returns a regEx with the same language as the automaton (with optimization)
 FiniteAutomata | Union(FiniteAutomata lhs,FiniteAutomata rhs) | Returns an automaton that is the union of lhs and rhs
 FiniteAutomata | Concatenation(FiniteAutomata lhs,FiniteAutomata rhs) | Returns an automaton that is the concatenation of lhs and rhs
 FiniteAutomata | KleeneStar(FiniteAutomata lhs) | Returns an automaton that is the KleeneStar of lhs
