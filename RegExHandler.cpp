@@ -13,6 +13,32 @@ namespace {
 		}
 		return ptr->clone();
 	}
+	RegEx**** initializeTable(int maxI, int maxJ) {
+		RegEx**** table = new RegEx * **[maxI];
+		for (int i = 0; i < maxI; i++)
+		{
+			table[i] = new RegEx * *[maxJ];
+			for (int j = 0; j < maxJ; j++)
+			{
+				table[i][j] = new RegEx * [2];
+			}
+		}
+
+		return table;
+	}
+	void deleteTable(RegEx**** table, int maxI, int maxJ) {
+		for (int i = 0; i < maxI; i++)
+		{
+			for (int j = 0; j < maxJ; j++)
+			{
+				delete table[i][j][0];
+				delete table[i][j][1];
+				delete[] table[i][j];
+			}
+			delete[] table[i];
+		}
+		delete[] table;
+	}
 }
 
 void RegExHandler::copyFrom(const RegExHandler& other) {
@@ -108,33 +134,6 @@ RegEx* RegExHandler::processWordWithKleene(RegEx* lhs, RegEx* rhs, RegEx* middle
 	}
 	lhs = RegExHandler::makeUnion(lhs, rhs);
 	return lhs;
-}
-
-RegEx**** initializeTable(int maxI,int maxJ) {
-	RegEx**** table = new RegEx ***[maxI];
-	for (int i = 0; i < maxI; i++)
-	{
-		table[i] = new RegEx **[maxJ];
-		for (int j = 0; j < maxJ; j++)
-		{
-			table[i][j] = new RegEx * [2];
-		}
-	}
-
-	return table;
-}
-void deleteTable(RegEx**** table ,int maxI, int maxJ) {
-	for (int i = 0; i < maxI; i++)
-	{
-		for (int j = 0; j < maxJ; j++)
-		{
-			delete table[i][j][0];
-			delete table[i][j][1];
-			delete [] table[i][j];
-		}
-		delete [] table[i];
-	}
-	delete [] table;
 }
 RegEx* RegExHandler::buildRegExFromAutomatonWithDP(const FiniteAutomata& automaton) {
 	RegEx**** last = initializeTable(automaton.nodes,automaton.nodes);
