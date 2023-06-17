@@ -53,7 +53,8 @@ public:
 
 	bool isEmptyLanguage()const;
 
-	RegExHandler getRegEx()const;
+	RegExHandler getRegExSlow()const;
+	RegExHandler getRegExFast()const;
 
 	FiniteAutomata& UnionWith(const FiniteAutomata& rhs);
 	FiniteAutomata& ConcatenationWith(const FiniteAutomata& rhs);

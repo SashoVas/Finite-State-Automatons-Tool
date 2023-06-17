@@ -95,7 +95,22 @@ void Engine::run() {
 				automaton.IntersectWith(b);
 				break;
 			case 12:
-				std::cout << automaton.getRegEx().getString() << std::endl;
+				std::cout << "0.Kleene algorithm without dynamic programing - O(4^n)" << std::endl;
+				std::cout << "1.Kleene algorithm with dynamic programing - O(n^3)" << std::endl;
+				std::cout << "" << std::endl;
+				std::cin >> mode;
+				switch (mode)
+				{
+				case 0:
+					std::cout << automaton.getRegExSlow().getString() << std::endl;
+					break;
+				case 1:
+					std::cout << automaton.getRegExFast().getString() << std::endl;
+				default:
+					std::cout << "Invalid operation" << std::endl;
+					return;
+					break;
+				}
 				break;
 			case 13:
 				std::cin >> currentInput;
@@ -105,6 +120,8 @@ void Engine::run() {
 				return;
 				break;
 			default:
+				std::cout << "Invalid operation" << std::endl;
+				return;
 				break;
 			}
 			std::cout << "-----------------------------------" << std::endl;

@@ -7,16 +7,15 @@
 #include "Engine.h"
 int main()
 {
-	//Engine::run();
-	{
-		FiniteAutomata a("(a+b)*ab+cd+(h+j)*");
-		a.print();
-		//a.minimize();
-		//std::cout << a.getRegEx().getString() << std::endl;
-		RegEx* result = RegExHandler::buildRegExFromAutomatonWithDP(a);
-		std::cout << result->getString() << std::endl;
-		delete result;
-	}
-
+	Engine::run();
+	//{
+	//	FiniteAutomata a("(a+b)*abcd+dc");
+	//	a.minimize();
+	//	a.print();
+	//	std::cout << a.getRegExSlow().getString()<<std::endl;
+	//	RegEx* result = RegExHandler::buildRegExFromAutomatonWithDP(a);
+	//	std::cout << result ->getString() << std::endl;
+	//	delete result;
+	//}
 	_CrtDumpMemoryLeaks();
 }

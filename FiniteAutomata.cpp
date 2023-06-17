@@ -400,8 +400,12 @@ void FiniteAutomata::makeTotal() {
 	}
 }
 
-RegExHandler FiniteAutomata::getRegEx()const {
-	return RegExHandler( *this);
+RegExHandler FiniteAutomata::getRegExSlow()const {//Implementation of kleene theoreme for turning automaton to regEx
+	return RegExHandler( RegExHandler::buildRegExFromAutomaton(*this));
+}
+
+RegExHandler FiniteAutomata::getRegExFast()const {//Implementation of kleene theoreme for turning automaton to regEx with dynamic programing
+	return RegExHandler(RegExHandler::buildRegExFromAutomatonWithDP(*this));
 }
 
 bool FiniteAutomata::accept(const MyString& word, int currentLetter, int node)const {

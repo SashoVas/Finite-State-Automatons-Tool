@@ -110,49 +110,67 @@ RegEx* RegExHandler::processWordWithKleene(RegEx* lhs, RegEx* rhs, RegEx* middle
 	return lhs;
 }
 
-RegEx* RegExHandler::buildRegExFromAutomatonWithDP(const FiniteAutomata& automaton) {
-	RegEx***** table = new RegEx****[automaton.nodes];
-	for (int k = 0; k < automaton.nodes; k++)
+RegEx**** initializeTable(int maxI,int maxJ) {
+	RegEx**** table = new RegEx ***[maxI];
+	for (int i = 0; i < maxI; i++)
 	{
-		table[k] = new RegEx ***[automaton.nodes];
-		for (int i = 0; i < automaton.nodes; i++)
+		table[i] = new RegEx **[maxJ];
+		for (int j = 0; j < maxJ; j++)
 		{
-			table[k][i] = new RegEx ** [automaton.nodes];
-			for (int j = 0; j < automaton.nodes; j++)
-			{
-				table[k][i][j] = new RegEx * [2];
-			}
+			table[i][j] = new RegEx * [2];
 		}
 	}
 
+	return table;
+}
+void deleteTable(RegEx**** table ,int maxI, int maxJ) {
+	for (int i = 0; i < maxI; i++)
+	{
+		for (int j = 0; j < maxJ; j++)
+		{
+			delete table[i][j][0];
+			delete table[i][j][1];
+			delete [] table[i][j];
+		}
+		delete [] table[i];
+	}
+	delete [] table;
+}
+RegEx* RegExHandler::buildRegExFromAutomatonWithDP(const FiniteAutomata& automaton) {
+	RegEx**** last = initializeTable(automaton.nodes,automaton.nodes);
+	RegEx**** current = nullptr;
 	for (int i = 0; i < automaton.nodes; i++)
 	{
 		for (int j = 0; j < automaton.nodes; j++)
 		{
-			table[0][i][j][0] = kleeneTheoremeBase(i,j,true,automaton);
-			table[0][i][j][1] = kleeneTheoremeBase(i, j, false, automaton);
+			last[i][j][0] = kleeneTheoremeBase(i,j,true,automaton);
+			last[i][j][1] = kleeneTheoremeBase(i, j, false, automaton);
 		}
 	}
 
-	for (int k = 1; k < automaton.nodes; k++)
+	for (int k = 1; k <= automaton.nodes; k++)
 	{
+		current = initializeTable(automaton.nodes, automaton.nodes);
 		for (int i = 0; i < automaton.nodes; i++)
 		{
 			for (int j = 0; j < automaton.nodes; j++)
 			{
-				table[k][i][j][0] = processWordWithKleene(
-					cloneOrNull(table[k - 1][i][j][0]),
-					cloneOrNull(table[k - 1][i][k - 1][0]),
-					cloneOrNull(table[k - 1][k - 1][k - 1][1]),
-					cloneOrNull(table[k - 1][k - 1][j][0]));
+				current[i][j][0] = processWordWithKleene(
+					cloneOrNull(last[i][j][0]),
+					cloneOrNull(last[i][k - 1][0]),
+					cloneOrNull(last[k - 1][k - 1][1]),
+					cloneOrNull(last[k - 1][j][0]));
 
-				table[k][i][j][1] = processWordWithKleene(
-					cloneOrNull(table[k - 1][i][j][1]), 
-					cloneOrNull(table[k - 1][i][k - 1][1]), 
-					cloneOrNull(table[k - 1][k - 1][k - 1][1]), 
-					cloneOrNull(table[k - 1][k - 1][j][1]));
+				current[i][j][1] = processWordWithKleene(
+					cloneOrNull(last[i][j][1]), 
+					cloneOrNull(last[i][k - 1][1]), 
+					cloneOrNull(last[k - 1][k - 1][1]), 
+					cloneOrNull(last[k - 1][j][1]));
 			}
 		}
+		deleteTable(last, automaton.nodes, automaton.nodes);
+		last = current;
+		current = nullptr;
 	}
 	RegEx* result = nullptr;
 	for (int i = 0; i < automaton.nodes; i++)
@@ -160,29 +178,17 @@ RegEx* RegExHandler::buildRegExFromAutomatonWithDP(const FiniteAutomata& automat
 		if (!automaton.finalStates.check(i))
 			continue;
 
-		if (result==nullptr && table[automaton.nodes - 1][automaton.startNode][i][0]!=nullptr)
-			result = table[automaton.nodes - 1][automaton.startNode][i][0]->clone();
-		else if(table[automaton.nodes - 1][automaton.startNode][i][0]!=nullptr)
-			result = makeUnion(result, table[automaton.nodes - 1][automaton.startNode][i][0]->clone());
+		if (result==nullptr && last[automaton.startNode][i][0]!=nullptr)
+			result = last[automaton.startNode][i][0]->clone();
+		else if(last[automaton.startNode][i][0]!=nullptr)
+			result = makeUnion(result, last[automaton.startNode][i][0]->clone());
 	}
 
-	for (int k = 0; k < automaton.nodes; k++)
-	{
-		for (int i = 0; i < automaton.nodes; i++)
-		{
-			for (int j = 0; j < automaton.nodes; j++)
-			{
-				delete table[k][i][j][0];
-				delete table[k][i][j][1];
-				delete[] table[k][i][j];
-			}
-			delete[] table[k][i];
-		}
-		delete [] table[k];
-	}
-	delete [] table;
+	deleteTable(last,automaton.nodes,automaton.nodes);
 	return result;
 }
+
+
 
 RegEx* RegExHandler::kleeneTheoremeBase(int i,int j,bool epsilon,const FiniteAutomata& automata) {
 	RegEx* result = nullptr;

@@ -325,9 +325,11 @@ bool AutomatonTests::runAutomatonFunctionsTests() {
 	bool minimizationTests = runAutomatonMinimizationTests();
 	std::cout << "Is empty language tests:" << std::endl;
 	bool emptyLanguageTests = isEmptyLanguageTests();
-	std::cout << "Get RegEx tests:" << std::endl;
-	bool getRegExTests = runAutomatonGetRegExTests();
-	return totalizationTests && determinizationTests && reverseTests && minimizationTests && emptyLanguageTests && getRegExTests;
+	std::cout << "Get RegEx slow tests:" << std::endl;
+	bool getRegExSlowTests = runAutomatonGetRegExSlowTests();
+	std::cout << "Get RegEx fast tests:" << std::endl;
+	bool getRegExFastTests = runAutomatonGetRegExFastTests();
+	return totalizationTests && determinizationTests && reverseTests && minimizationTests && emptyLanguageTests && getRegExSlowTests && getRegExFastTests;
 }
 bool AutomatonTests::runAutomatonTests() {
 	std::cout << "Automaton operation tests:" << std::endl;
@@ -350,13 +352,40 @@ bool AutomatonTests::isEmptyLanguageTests() {
 	std::cout << !result2 << std::endl;
 	return result && !result2;
 }
-bool AutomatonTests::runAutomatonGetRegExTests() {
+bool AutomatonTests::runAutomatonGetRegExSlowTests() {
 	//Arange
 	FiniteAutomata automata("(a+b)*abcd+dc");
 	automata.minimize();
 	//Act
-	//RegExHandler regEx = automata.getRegEx();
-	FiniteAutomata result(automata.getRegEx());
+	FiniteAutomata result(automata.getRegExSlow());
+	//Assert
+	bool isValid = true;
+	isValid = isValid && assertWordAccepted("abcd", result);
+	isValid = isValid && assertWordAccepted("aabcd", result);
+	isValid = isValid && assertWordAccepted("babcd", result);
+	isValid = isValid && assertWordAccepted("babababbbbaababcd", result);
+	isValid = isValid && assertWordAccepted("aabababbbbaababcd", result);
+	isValid = isValid && assertWordAccepted("dc", result);
+
+	isValid = isValid && assertWordRejected("a", result);
+	isValid = isValid && assertWordRejected("ab", result);
+	isValid = isValid && assertWordRejected("abc", result);
+	isValid = isValid && assertWordRejected("b", result);
+	isValid = isValid && assertWordRejected("c", result);
+	isValid = isValid && assertWordRejected("d", result);
+	isValid = isValid && assertWordRejected("bcd", result);
+	isValid = isValid && assertWordRejected("", result);
+	isValid = isValid && assertWordRejected("ababababbbababc", result);
+	isValid = isValid && assertWordRejected("ababababbbababd", result);
+	return isValid;
+}
+
+bool AutomatonTests::runAutomatonGetRegExFastTests() {
+	//Arange
+	FiniteAutomata automata("(a+b)*abcd+dc");
+	automata.minimize();
+	//Act
+	FiniteAutomata result(automata.getRegExFast());
 	//Assert
 	bool isValid = true;
 	isValid = isValid && assertWordAccepted("abcd", result);
