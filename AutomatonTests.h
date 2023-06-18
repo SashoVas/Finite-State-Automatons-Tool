@@ -22,6 +22,7 @@ public:
 	static bool runAutomatonMinimizationTests();
 	static bool runAutomatonReverseTests();
 	static bool isEmptyLanguageTests();
+	static bool isDeterministicTests();
 	static bool runAutomatonGetRegExSlowTests();
 	static bool runAutomatonGetRegExFastTests();
 

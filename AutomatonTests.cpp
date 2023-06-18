@@ -323,13 +323,15 @@ bool AutomatonTests::runAutomatonFunctionsTests() {
 	bool reverseTests = runAutomatonReverseTests();
 	std::cout << "Minimization tests:" << std::endl;
 	bool minimizationTests = runAutomatonMinimizationTests();
+	std::cout << "Is determinisitic tests:" << std::endl;
+	bool isDeterministic = isDeterministicTests();
 	std::cout << "Is empty language tests:" << std::endl;
 	bool emptyLanguageTests = isEmptyLanguageTests();
 	std::cout << "Get RegEx slow tests:" << std::endl;
 	bool getRegExSlowTests = runAutomatonGetRegExSlowTests();
 	std::cout << "Get RegEx fast tests:" << std::endl;
 	bool getRegExFastTests = runAutomatonGetRegExFastTests();
-	return totalizationTests && determinizationTests && reverseTests && minimizationTests && emptyLanguageTests && getRegExSlowTests && getRegExFastTests;
+	return totalizationTests && determinizationTests && reverseTests && minimizationTests && isDeterministic && emptyLanguageTests && getRegExSlowTests && getRegExFastTests;
 }
 bool AutomatonTests::runAutomatonTests() {
 	std::cout << "Automaton operation tests:" << std::endl;
@@ -352,6 +354,17 @@ bool AutomatonTests::isEmptyLanguageTests() {
 	std::cout << !result2 << std::endl;
 	return result && !result2;
 }
+bool AutomatonTests::isDeterministicTests() {
+	FiniteAutomata automata("(a+b)*abcd+dc");
+	bool isValid = true;
+	isValid = isValid && !automata.isDeterministic();
+	std::cout << isValid << std::endl;
+	automata.makeDeterministic();
+	isValid= isValid && automata.isDeterministic();
+	std::cout << isValid << std::endl;
+	return isValid;
+}
+
 bool AutomatonTests::runAutomatonGetRegExSlowTests() {
 	//Arange
 	FiniteAutomata automata("(a+b)*abcd+dc");

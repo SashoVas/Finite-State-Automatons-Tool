@@ -44,10 +44,12 @@ namespace {
 void RegExHandler::copyFrom(const RegExHandler& other) {
 	ptr = other.ptr->clone();
 }
+
 void RegExHandler::moveFrom(RegExHandler&& other) {
 	ptr = other.ptr;
 	other.ptr = nullptr;
 }
+
 void RegExHandler::free() {
 	delete ptr;
 }
@@ -55,9 +57,11 @@ void RegExHandler::free() {
 RegExHandler::RegExHandler(RegEx* ptr) {
 	this->ptr = ptr;
 }
+
 RegExHandler::RegExHandler(const MyString& str) {
 	ptr = buildRegExFromString(str);
 }
+
 RegExHandler::RegExHandler(const FiniteAutomata& automata) {
 	ptr = buildRegExFromAutomaton(automata);
 }
@@ -69,6 +73,7 @@ RegExHandler::~RegExHandler() {
 RegExHandler::RegExHandler(const RegExHandler& other) {
 	copyFrom(other);
 }
+
 RegExHandler::RegExHandler(RegExHandler&& other) {
 	moveFrom(std::move(other));
 }
@@ -81,6 +86,7 @@ RegExHandler& RegExHandler::operator=(const RegExHandler& other) {
 	}
 	return *this;
 }
+
 RegExHandler& RegExHandler::operator=(RegExHandler&& other) {
 	if (this != &other)
 	{
@@ -89,6 +95,7 @@ RegExHandler& RegExHandler::operator=(RegExHandler&& other) {
 	}
 	return *this;
 }
+
 RegEx* RegExHandler::processWordWithKleene(RegEx* lhs, RegEx* rhs, RegEx* middle, RegEx* end) {
 	if (rhs == nullptr || end == nullptr)
 	{
@@ -135,6 +142,7 @@ RegEx* RegExHandler::processWordWithKleene(RegEx* lhs, RegEx* rhs, RegEx* middle
 	lhs = RegExHandler::makeUnion(lhs, rhs);
 	return lhs;
 }
+
 RegEx* RegExHandler::buildRegExFromAutomatonWithDP(const FiniteAutomata& automaton) {
 	RegEx**** last = initializeTable(automaton.nodes,automaton.nodes);
 	RegEx**** current = nullptr;
@@ -187,8 +195,6 @@ RegEx* RegExHandler::buildRegExFromAutomatonWithDP(const FiniteAutomata& automat
 	return result;
 }
 
-
-
 RegEx* RegExHandler::kleeneTheoremeBase(int i,int j,bool epsilon,const FiniteAutomata& automata) {
 	RegEx* result = nullptr;
 	bool isSet = false;
@@ -214,6 +220,7 @@ RegEx* RegExHandler::kleeneTheoremeBase(int i,int j,bool epsilon,const FiniteAut
 	}
 	return result;
 }
+
 RegEx* RegExHandler::generateRegExFromAutomatonInRange(int i, int j, int k, bool epsilon, const FiniteAutomata& automata) {
 	if (k == 0)
 		return kleeneTheoremeBase(i,j,epsilon,automata);
@@ -256,6 +263,7 @@ RegEx* RegExHandler::buildRegExFromString(const MyString& str) {
 	int a = 0;
 	return getRegExFromString(str, a);
 }
+
 RegEx* RegExHandler::getRegExFromString(const MyString& str, int& currentPosition) {
 	RegEx* result = nullptr;
 	if (str[currentPosition] == '(')
@@ -301,12 +309,16 @@ RegEx* RegExHandler::getRegExFromString(const MyString& str, int& currentPositio
 		}
 		else if (str[currentPosition] == '+') {
 			currentPosition++;
+			if (str[currentPosition]==' ')
+			{
+				currentPosition++;
+			}
 			RegEx* right = getRegExFromString(str, currentPosition);
 			result = new UnionRegEx(result, right);
 			if (str[currentPosition] == ')')
 				return result;
 		}
-		else if (str[currentPosition] == '.') {
+		else if (str[currentPosition] == '.'|| str[currentPosition] == ' ') {
 			continue;
 		}
 		else {
@@ -316,21 +328,27 @@ RegEx* RegExHandler::getRegExFromString(const MyString& str, int& currentPositio
 	}
 	return result;
 }
+
 RegEx* RegExHandler::makeUnion(RegEx* left, RegEx* right) {
 	return new UnionRegEx(left, right);
 }
+
 RegEx* RegExHandler::makeConcatenation(RegEx* left, RegEx* right) {
 	return new ConcatenationRegEx(left, right);
 }
+
 RegEx* RegExHandler::makeKleeneStar(RegEx* left) {
 	return new KleeneStarRegEx(left);
 }
+
 RegEx* RegExHandler::makeSymbol(char symbol) {
 	return new Symbol(symbol);
 }
+
 MyString RegExHandler::getString() const {
 	return ptr->getString();
 }
+
 FiniteAutomata RegExHandler::getAutomata() const {
 	return ptr->getAutomaton();
 }
@@ -338,6 +356,7 @@ FiniteAutomata RegExHandler::getAutomata() const {
 void RegExHandler::UnionWith(const RegExHandler& other) {
 	ptr = new UnionRegEx(ptr,other.ptr->clone());
 }
+
 void RegExHandler::ConcatenateWith(const RegExHandler& other) {
 	ptr = new ConcatenationRegEx(ptr, other.ptr->clone());
 }
@@ -346,10 +365,12 @@ void RegExHandler::UnionWith(RegExHandler&& other) {
 	ptr = new UnionRegEx(ptr, other.ptr);
 	other.ptr = nullptr;
 }
+
 void RegExHandler::ConcatenateWith(RegExHandler&& other) {
 	ptr = new ConcatenationRegEx(ptr, other.ptr);
 	other.ptr = nullptr;
 }
+
 void RegExHandler::KleeneStar() {
 	ptr = new KleeneStarRegEx(ptr);
 }

@@ -11,7 +11,7 @@ const char* BitSet::getRaw()const {
 }
 
 int BitSet::getBucketsCount()const {
-	return (capacity + 1) / 8 + 1;
+	return (capacity+1) / 8 +1;
 }
 int BitSet::getBucketIndex(int index)const {
 	return index / 8;
@@ -51,6 +51,7 @@ BitSet::BitSet(int size) {
 	capacity = size * 2;
 	this->size = size;
 	data = new char[getBucketsCount()]{ 0 };
+	truesCount = 0;
 }
 BitSet::~BitSet() {
 	free();
@@ -78,11 +79,12 @@ BitSet& BitSet::operator=(BitSet&& other) {
 	return *this;
 }
 void BitSet::resize(int newCapacity) {
+	int oldBucketsCount = getBucketsCount();
 	capacity = newCapacity;
 
 	char* newData = new char[getBucketsCount()]{ 0 };
 
-	for (int i = 0; i < getBucketsCount(); i++)
+	for (int i = 0; i < oldBucketsCount; i++)
 	{
 		newData[i] = data[i];
 	}
@@ -90,14 +92,17 @@ void BitSet::resize(int newCapacity) {
 	data = newData;
 }
 void BitSet::toggle(int index) {
-
+	if (index>=size)
+	{
+		throw std::invalid_argument("Invalid index!");
+	}
 	int bucketIndex = getBucketIndex(index);
 	if (bucketIndex >= getBucketsCount())
 	{
 		throw std::invalid_argument("Invalid argument");
 	}
 	int positionMask = getBucketPositionMask(index);
-	if (!(positionMask & data[bucketIndex]))
+	if (!(data[bucketIndex]& positionMask))
 	{
 		truesCount++;
 	}

@@ -19,6 +19,7 @@ void AutomatonFileHandler::writeToFile(const char* fileName, const FiniteAutomat
 	//FinalStates
 	output.write((const char*)&automaton.finalStates.size, sizeof(int));
 	output.write((const char*)&automaton.finalStates.capacity, sizeof(int));
+	output.write((const char*)&automaton.finalStates.truesCount, sizeof(int));
 	output.write((const char*)automaton.finalStates.data, automaton.finalStates.getBucketsCount() * sizeof(char));
 	//Alphabet
 	output.write((const char*)&automaton.alphabet.size, sizeof(int));
@@ -54,10 +55,13 @@ FiniteAutomata AutomatonFileHandler::readFromFile(const char* fileName) {
 	//FinalStates
 	int finalStatesSize = 0;
 	int finalStatesCapacity = 0;
+	int finalTruesCount = 0;
 	input.read((char*)&finalStatesSize, sizeof(int));
 	input.read((char*)&finalStatesCapacity, sizeof(int));
+	input.read((char*)&finalTruesCount, sizeof(int));
 	BitSet finals(finalStatesSize);
 	input.read((char*)finals.data, ((finalStatesCapacity + 1) / 8 + 1)* sizeof(char));
+	finals.truesCount = finalTruesCount;
 	result.finalStates = std::move(finals);
 	//Alphabet
 	int alphabetSize = 0;

@@ -11,6 +11,7 @@ namespace {//Logic for determization
 			this->states = std::move(states);
 		}
 	};
+
 	int findInTableByNode(int node, const CustomCollection<StateTuple>& stateTable) {
 		for (int i = 0; i < stateTable.getSize(); i++)
 		{
@@ -19,6 +20,7 @@ namespace {//Logic for determization
 		}
 		return -1;
 	}
+
 	int findInTableByNodeByStates(const CustomCollection<int>& currentStates, const CustomCollection<StateTuple>& stateTable) {
 		for (int i = 0; i < stateTable.getSize(); i++)
 		{
@@ -27,17 +29,24 @@ namespace {//Logic for determization
 		}
 		return -1;
 	}
+
+	bool isInRange(int l, int r, int val) {
+		return val >= l && val <= r;
+	}
 }
 
 FiniteAutomata::FiniteAutomata(int size) :automata(size), finalStates(size) {
 	startNode = 0;
 	nodes = size;
+
 	for (int i = 0; i < size; i++)
-	{
 		automata.add(CustomCollection<Transition>());
-	}
 }
+
 FiniteAutomata::FiniteAutomata(char symbol) {
+	if (!isInRange('0', '9', symbol) && !isInRange('a', 'z', symbol) && !isInRange('A', 'Z', symbol) && symbol != '$')
+		throw std::invalid_argument("Letter not allowed!");
+
 	startNode = 0;
 	CustomCollection<Transition>t;
 	if (symbol!='$')
@@ -59,10 +68,12 @@ FiniteAutomata::FiniteAutomata(char symbol) {
 		finalStates.toggle(0);
 	}
 }
+
 FiniteAutomata::FiniteAutomata(const MyString& regEx) {
 	FiniteAutomata toReplace = RegExHandler(regEx).getAutomata();
 	*this = std::move(toReplace);
 }
+
 FiniteAutomata::FiniteAutomata(const RegExHandler& regEx) {
 	*this = std::move(regEx.getAutomata());
 }
@@ -76,12 +87,15 @@ void FiniteAutomata::addToAlphabet(char symbol) {
 void FiniteAutomata::addTransition(int index, const Transition& transition) {
 	if (index >= nodes)
 		throw std::invalid_argument("Invalid argument");
+
 	automata[index].add(transition);
 	addToAlphabet(transition.symbol);
 }
+
 void FiniteAutomata::makeFinal(int index) {
 	if (index >= nodes)
 		throw std::invalid_argument("Invalid argument");
+
 	finalStates.toggle(index);
 }
 
@@ -136,9 +150,8 @@ void FiniteAutomata::addState() {
 
 void FiniteAutomata::changeStart(int index) {
 	if (index >= nodes)
-	{
 		throw std::invalid_argument("invalid index");
-	}
+
 	startNode = index;
 }
 
@@ -154,6 +167,7 @@ void FiniteAutomata::combine(const FiniteAutomata& other) {
 		}
 	}
 }
+
 FiniteAutomata FiniteAutomata::Union(const FiniteAutomata& lhs, const FiniteAutomata& rhs) {
 	FiniteAutomata result(lhs);
 	result.UnionWith(rhs);
@@ -171,21 +185,25 @@ FiniteAutomata FiniteAutomata::KleeneStar(const FiniteAutomata& lhs) {
 	result.KleeneStar();
 	return result;
 }
+
 FiniteAutomata FiniteAutomata::Complement(const FiniteAutomata& lhs) {
 	FiniteAutomata result(lhs);
 	result.Complement();
 	return result;
 }
+
 FiniteAutomata FiniteAutomata::Intersection(const FiniteAutomata& lhs, const FiniteAutomata& rhs) {
 	FiniteAutomata result(lhs);
 	result.IntersectWith(rhs);
 	return result;
 }
-FiniteAutomata FiniteAutomata::Difference(const FiniteAutomata& lhs, const FiniteAutomata& rhs) {
+
+FiniteAutomata FiniteAutomata::Difference(const FiniteAutomata& lhs, const FiniteAutomata& rhs) {//A\B = A & (!B)
 	FiniteAutomata result(lhs);
 	result.DifferenceWith(rhs);
 	return result;
 }
+
 FiniteAutomata& FiniteAutomata::KleeneStar() {
 	for (int i = 0; i < nodes; i++)
 	{
@@ -263,9 +281,9 @@ FiniteAutomata& FiniteAutomata::ConcatenationWith(const FiniteAutomata& rhs) {
 
 	return *this;
 }
+
 FiniteAutomata& FiniteAutomata::Complement() {
 	makeDeterministic();
-	//makeTotal();
 	BitSet newFinals(nodes);
 	for (int i = 0; i < nodes; i++)
 	{
@@ -275,18 +293,21 @@ FiniteAutomata& FiniteAutomata::Complement() {
 	finalStates = std::move(newFinals);
 	return *this;
 }
-FiniteAutomata& FiniteAutomata::IntersectWith(const FiniteAutomata& rhs) {
+
+FiniteAutomata& FiniteAutomata::IntersectWith(const FiniteAutomata& rhs) {//De Morgan's law
 	FiniteAutomata rhsComp = FiniteAutomata(rhs).Complement();
 	Complement();
 	UnionWith(rhsComp);
 	Complement();
 	return *this;
 }
-FiniteAutomata& FiniteAutomata::DifferenceWith(const FiniteAutomata& rhs) {
+
+FiniteAutomata& FiniteAutomata::DifferenceWith(const FiniteAutomata& rhs) {//A\B = A & (!B)
 	FiniteAutomata rhsComp = FiniteAutomata(rhs).Complement();
 	IntersectWith(rhsComp);
 	return *this;
 }
+
 CustomCollection<int> FiniteAutomata::getNodeStates(const CustomCollection<int>& nodes, char symbol)const {
 	CustomCollection<int>result;
 	for (int j = 0; j < nodes.getSize(); j++)
@@ -316,7 +337,7 @@ void FiniteAutomata::makeDeterministic() {
 
 	FiniteAutomata newAutomaton;
 
-	CustomCollection<StateTuple>stateTable(128);
+	CustomCollection<StateTuple>stateTable(1024);
 	MyQueue<int>queue;
 	CustomCollection<int>newStart;
 
@@ -347,10 +368,10 @@ void FiniteAutomata::makeDeterministic() {
 			{
 				newAutomaton.addState();
 				queue.push(newAutomaton.nodes - 1);
+
 				if (haveFinal(nextStates))
-				{
 					newAutomaton.makeFinal(newAutomaton.nodes - 1);
-				}
+
 				stateTable.add(StateTuple(std::move(nextStates), newAutomaton.nodes - 1));
 				newAutomaton.addTransition(currentInNew, Transition(newAutomaton.nodes - 1, currentChar));
 			}
@@ -362,21 +383,18 @@ void FiniteAutomata::makeDeterministic() {
 	newAutomaton.makeTotal();
 	*this = std::move(newAutomaton);
 }
+
 void FiniteAutomata::addErrorState() {
 	addState();
 	for (int i = 0; i < alphabet.getSize(); i++)
-	{
 		addTransition(nodes - 1, Transition(nodes - 1, alphabet[i]));
-	}
-
 }
+
 bool FiniteAutomata::haveTransitionWihtSymbol(int node, char symbol, int to) const {
 	for (int i = 0; i < automata[node].getSize(); i++)
 	{
 		if (automata[node][i].symbol == symbol)
-		{
 			return to == -1 ? true : automata[node][i].dest == to;
-		}
 	}
 	return false;
 }
@@ -436,6 +454,7 @@ bool FiniteAutomata::accept(const MyString& word, int currentLetter, int node)co
 	}
 	return false;
 }
+
 void FiniteAutomata::setReverseTransitions(FiniteAutomata& result)const {
 	for (int i = 0; i < nodes; i++)
 	{
@@ -466,6 +485,7 @@ void FiniteAutomata::setReverseMultipleStart(FiniteAutomata& result) const{
 	if (finalStates.check(startNode))
 		result.makeFinal(nodes);
 }
+
 void FiniteAutomata::setFinalToBeStart(FiniteAutomata& result)const {
 	for (int i = 0; i < nodes; i++)
 	{
@@ -492,6 +512,7 @@ FiniteAutomata FiniteAutomata::getReverse() const {
 
 	return result;
 }
+
 void FiniteAutomata::reverse() {
 	FiniteAutomata result = getReverse();
 	*this = std::move(result);
@@ -505,6 +526,7 @@ void FiniteAutomata::minimize() {
 	makeDeterministic();
 	multiplStarts = false;
 }
+
 bool FiniteAutomata::isEmptyLanguage()const {
 	MyQueue<int>queue;
 	queue.push(startNode);
@@ -529,5 +551,23 @@ bool FiniteAutomata::isEmptyLanguage()const {
 		}
 	}
 	delete[] visited;
+	return true;
+}
+
+bool FiniteAutomata::isDeterministic()const {
+	int letters['z' + 1] = {0};
+	for (int i = 0; i < nodes; i++)
+	{
+		if (automata[i].getSize()!=alphabet.getSize())
+			return false;
+
+		for (int j = 0; j < automata[i].getSize(); j++)
+		{
+			if (letters[automata[i][j].symbol]==i+1)
+				return false;
+
+			letters[automata[i][j].symbol] ++;
+		}
+	}
 	return true;
 }

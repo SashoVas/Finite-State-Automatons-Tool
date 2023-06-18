@@ -12,7 +12,7 @@ void Engine::printInstructions() {
 	std::cout << "1.Determinize" << std::endl;
 	std::cout << "2.Minimize" << std::endl;
 	std::cout << "3.Totalize" << std::endl;
-	std::cout << "4.Run (string word)" << std::endl;
+	std::cout << "4.Check word (string word)" << std::endl;
 	std::cout << "5.Is language empty" << std::endl;
 	std::cout << "6.Union with (string otherAutomatonRegEx)" << std::endl;
 	std::cout << "7.Concatenation with (string otherAutomatonRegEx)" << std::endl;
@@ -63,10 +63,10 @@ void Engine::run() {
 				break;
 			case 4:
 				std::cin >> currentInput;
-				std::cout << automaton.accept(currentInput) << std::endl;
+				std::cout << (automaton.accept(currentInput)?"accepted":"rejected") << std::endl;
 				break;
 			case 5:
-				std::cout << automaton.isEmptyLanguage() << std::endl;
+				std::cout << (automaton.isEmptyLanguage()?"Language is empty":"Language is not empty") << std::endl;
 				break;
 			case 6:
 				std::cin >> currentInput;
@@ -106,6 +106,7 @@ void Engine::run() {
 					break;
 				case 1:
 					std::cout << automaton.getRegExFast().getString() << std::endl;
+					break;
 				default:
 					std::cout << "Invalid operation" << std::endl;
 					return;
