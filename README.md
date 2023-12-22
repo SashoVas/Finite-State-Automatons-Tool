@@ -21,7 +21,7 @@ For a regular expression "(ab+cd)(e+f)*a" the tree would look like this.
     C(Union)--> A & D;
     D(Concatenation) --> C1((c)) & D1((d))
     E(Concatenation) --> C & G
-    F(Concatenation) --> E1((e)) & F1((f))
+    F(Union) --> E1((e)) & F1((f))
     G(Kleene Star)-->F
     H(Concatenation)-->E & A2((a))
 ```
